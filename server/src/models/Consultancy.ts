@@ -1,0 +1,3 @@
+import { Schema, model } from 'mongoose';
+const consultancySchema = new Schema({ name: { type: String, required: true }, city: { type: String, required: true }, services: [String], destinations: [String], description: String, contact: { phone: String, email: String, website: String }, documents: [{ name: String, url: String }], verificationStatus: { type: String, enum: ['pending', 'verified', 'rejected'], default: 'pending' }, visaApprovalRate: { type: Number, min: 0, max: 100 }, rating: { type: Number, default: 0 }, reviewCount: { type: Number, default: 0 } }, { timestamps: true });
+export const Consultancy = model('Consultancy', consultancySchema);

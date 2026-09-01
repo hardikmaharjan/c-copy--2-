@@ -1,0 +1,7 @@
+node_modules
+dist
+.env
+uploads
+*.tsbuildinfo
+.DS_Store
+client/vite.config.d.ts
