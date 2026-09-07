@@ -100,10 +100,11 @@ catch (e) {
 export function Reviews() { const [params] = useSearchParams(); const [consultancies, setConsultancies] = useState([]); const [items, setItems] = useState([]); const [selected, setSelected] = useState(params.get('consultancy') || ''); const [loading, setLoading] = useState(false); const [message, setMessage] = useState(''); useEffect(() => { http.get('/consultancies').then(r => setConsultancies(r.data.items)).catch(() => setMessage('Unable to load consultancies.')); }, []); useEffect(() => { setMessage(''); if (!selected) {
     setItems([]);
     return;
-} setLoading(true); http.get('/reviews', { params: { consultancy: selected } }).then(r => setItems(r.data.items)).catch(() => { setItems([]); setMessage('Unable to load reviews.'); }).finally(() => setLoading(false)); }, [selected]); async function submit(e) { e.preventDefault(); try {
-    await http.post('/reviews', { ...Object.fromEntries(new FormData(e.currentTarget)), consultancy: selected });
+} setLoading(true); http.get('/reviews', { params: { consultancy: selected } }).then(r => setItems(r.data.items)).catch(() => { setItems([]); setMessage('Unable to load reviews.'); }).finally(() => setLoading(false)); }, [selected]); async function submit(e) { e.preventDefault(); const form = e.currentTarget; try {
+    const { data } = await http.post('/reviews', { ...Object.fromEntries(new FormData(form)), consultancy: selected });
+    setItems(current => [{ ...data.review, author: { name: 'You' } }, ...current]);
     setMessage('Your review is now live.');
-    e.currentTarget.reset();
+    form.reset();
 }
 catch (e) {
     setMessage(e.response?.data?.message || 'Log in to submit a review.');
