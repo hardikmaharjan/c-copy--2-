@@ -16,7 +16,7 @@ router.get('/mine', requireAuth, asyncRoute(async (req: AuthRequest, res) => {
   res.json({ items: await Report.find({ reporter: req.user!.id }).sort({ createdAt: -1 }) });
 }));
 router.get('/', requireAuth, requireAdmin, asyncRoute(async (_req, res) => {
-  res.json({ items: await Report.find().sort({ createdAt: -1 }) });
+  res.json({ items: await Report.find().populate('reporter', 'name email').sort({ createdAt: -1 }) });
 }));
 router.patch('/:id/status', requireAuth, requireAdmin, asyncRoute(async (req, res) => {
   if (!['submitted', 'under_review', 'verified', 'resolved', 'rejected'].includes(req.body.status)) return res.status(400).json({ message: 'Invalid report status' });

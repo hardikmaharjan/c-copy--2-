@@ -568,6 +568,9 @@ export function AdminPortal() {
             ) : (
               <p>There are no open reports.</p>
             )}
+            <Link className="button" to="/admin/reports">
+              Open report manager →
+            </Link>
           </Card>
         </section>
         <section className="portal-panel" id="content">
@@ -886,6 +889,116 @@ export function ConsultancyManagement() {
             <Button>Add to verification queue →</Button>
           </form>
         </section>
+      </div>
+    </section>
+  );
+}
+
+export function ScamReportManagement() {
+  const { user } = useAuthStore();
+  const [items, setItems] = useState([]);
+  const [selected, setSelected] = useState(null);
+  const [adminNotes, setAdminNotes] = useState("");
+  const [message, setMessage] = useState("");
+
+  const load = useCallback(async () => {
+    try {
+      const { data } = await http.get("/reports");
+      setItems(data.items);
+    } catch (error) {
+      setMessage(error.response?.data?.message || "Unable to load scam reports.");
+    }
+  }, []);
+
+  useEffect(() => {
+    if (user?.role === "admin") load();
+  }, [user, load]);
+
+  if (user?.role !== "admin") {
+    return <section className="portal-empty"><h1>Administrator access required.</h1></section>;
+  }
+
+  function choose(report) {
+    setSelected(report);
+    setAdminNotes(report.adminNotes || "");
+  }
+
+  async function save(status) {
+    if (!selected) return;
+    try {
+      const { data } = await http.patch(`/reports/${selected._id}/status`, { status, adminNotes });
+      setSelected(data);
+      setAdminNotes(data.adminNotes || "");
+      setMessage("Scam report updated.");
+      await load();
+    } catch (error) {
+      setMessage(error.response?.data?.message || "Unable to update this scam report.");
+    }
+  }
+
+  return (
+    <section className="portal management-page">
+      <aside className="portal-sidebar">
+        <div>
+          <p className="eyebrow">ADMIN CONSOLE</p>
+          <h2>Scam report<br />manager.</h2>
+          <p>Review every detail before approving, rejecting, or resolving a report.</p>
+        </div>
+        <nav>
+          <Link to="/admin">← Back to overview</Link>
+          <a href="#reports">All scam reports</a>
+          {selected && <a href="#report-detail">Selected report</a>}
+        </nav>
+      </aside>
+      <div className="portal-content">
+        <div className="portal-title">
+          <div>
+            <p className="eyebrow">SAFETY CENTRE</p>
+            <h1>Manage scam reports.</h1>
+          </div>
+          <p>Open a report to see the student’s description, evidence, and any administrative notes.</p>
+        </div>
+        {message && <p className="notice">{message}</p>}
+        <section className="portal-panel" id="reports">
+          <div className="panel-head">
+            <div><p className="eyebrow">ALL REPORTS</p><h2>{items.length} submitted report{items.length === 1 ? "" : "s"}</h2></div>
+            <button className="link" onClick={load}>Refresh reports ↻</button>
+          </div>
+          <div className="provider-table">
+            {items.map((report) => (
+              <div key={report._id}>
+                <div>
+                  <strong>{report.consultancyName || "Unknown consultancy"}</strong>
+                  <small>{report.scamType} · {new Date(report.createdAt).toLocaleDateString()}</small>
+                </div>
+                <Status>{report.status}</Status>
+                <button className="link" onClick={() => choose(report)}>View details</button>
+              </div>
+            ))}
+          </div>
+        </section>
+        {selected && (
+          <section className="portal-panel edit-provider" id="report-detail">
+            <div className="panel-head">
+              <div><p className="eyebrow">REPORT DETAILS</p><h2>{selected.consultancyName || "Unknown consultancy"}</h2></div>
+              <button className="link" onClick={() => setSelected(null)}>Close ×</button>
+            </div>
+            <div className="support-inbox">
+              <article className="support-ticket">
+                <div className="support-ticket-head"><div><span className="support-category">{selected.scamType}</span><h3>Submitted by {selected.reporter?.name || "Student"}</h3><small>{selected.reporter?.email || "No reporter email"} · {new Date(selected.createdAt).toLocaleString()}</small></div><Status>{selected.status}</Status></div>
+                <p className="support-message">{selected.description}</p>
+                <div className="previous-reply"><b>Evidence</b>{selected.evidence?.length ? selected.evidence.map((item, index) => <p key={`${item.url}-${index}`}><a href={item.url} target="_blank" rel="noreferrer">{item.label || `Open evidence ${index + 1}`} ↗</a></p>) : <p>No evidence link was provided.</p>}</div>
+                <label>Admin notes<textarea value={adminNotes} onChange={(event) => setAdminNotes(event.target.value)} placeholder="Add notes for the review decision" /></label>
+                <div className="queue-actions">
+                  <button className="link" onClick={() => save("under_review")}>Mark under review</button>
+                  <button className="link" onClick={() => save("verified")}>Approve report</button>
+                  <button className="link danger" onClick={() => save("rejected")}>Reject report</button>
+                  <button className="button" onClick={() => save("resolved")}>Resolve report</button>
+                </div>
+              </article>
+            </div>
+          </section>
+        )}
       </div>
     </section>
   );
