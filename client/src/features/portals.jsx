@@ -266,7 +266,7 @@ export function StudentPortal() {
   );
 }
 export function AdminPortal() {
-  const { user } = useAuthStore();
+  const { user, logout } = useAuthStore();
   const [users, setUsers] = useState([]);
   const [consultancies, setConsultancies] = useState([]);
   const [reports, setReports] = useState([]);
@@ -373,9 +373,7 @@ export function AdminPortal() {
           <Link to="/admin/consultancies">Manage consultancies</Link>
           <a href="#content">Content studio</a>
         </nav>
-        <Link className="button" to="/">
-          View public site ↗
-        </Link>
+        <button className="button" onClick={logout}>Log out</button>
       </aside>
       <div className="portal-content">
         <div className="portal-title">

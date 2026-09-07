@@ -1,9 +1,10 @@
-import { Link, Outlet, useLocation } from 'react-router-dom';
+import { Link, Navigate, Outlet, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 export function AppLayout() {
     const { user, logout } = useAuthStore();
     const location = useLocation();
     const nav = [['Consultancies', '/consultancies'], ['Explore countries', '/countries'], ['Visa information', '/study/visa'], ['Reviews', '/reviews'], ['Report', '/reports/new']];
+    if (user?.role === 'admin') return <Navigate to="/admin" replace />;
     return <>
     <header className="site-header">
       <Link className="brand" to="/"><span className="brand-mark">↗</span><span>dream<br /><em>chaser</em></span></Link>

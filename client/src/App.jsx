@@ -57,31 +57,31 @@ export default function App() {
           }
         />
         <Route path="/reviews" element={<Reviews />} />
-        <Route
-          path="/admin"
-          element={
-            <Protected admin>
-              <AdminPortal />
-            </Protected>
-          }
-        />
-        <Route
-          path="/admin/consultancies"
-          element={
-            <Protected admin>
-              <ConsultancyManagement />
-            </Protected>
-          }
-        />
-        <Route
-          path="/admin/reports"
-          element={
-            <Protected admin>
-              <ScamReportManagement />
-            </Protected>
-          }
-        />
       </Route>
+      <Route
+        path="/admin"
+        element={
+          <Protected admin>
+            <AdminPortal />
+          </Protected>
+        }
+      />
+      <Route
+        path="/admin/consultancies"
+        element={
+          <Protected admin>
+            <ConsultancyManagement />
+          </Protected>
+        }
+      />
+      <Route
+        path="/admin/reports"
+        element={
+          <Protected admin>
+            <ScamReportManagement />
+          </Protected>
+        }
+      />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
