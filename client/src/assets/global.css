@@ -381,7 +381,7 @@ main { max-width: 1380px; padding: 38px 40px 110px; }
 .hero-copy > p:not(.eyebrow) { max-width: 650px; font-size: 17px; }
 .hero-actions { margin-top: 34px !important; }
 .hero-trust { margin-top: 32px !important; display: flex; gap: 18px !important; color: #c9d0e2; font-size: 11px; font-weight: 700; }
-.no-sponsored-note { margin: 10px 0 0 !important; color: #c9d0e2; font-size: 11px !important; font-weight: 600; }
+.no-sponsored-note { margin: 16px 0 0 !important; color: #ffffff; font-size: 16px !important; font-weight: 800; line-height: 1.4; }
 .hero-panel {
   align-self: center;
   padding: 30px;
