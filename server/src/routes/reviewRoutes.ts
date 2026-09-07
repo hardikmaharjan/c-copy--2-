@@ -19,7 +19,7 @@ router.post('/', requireAuth, asyncRoute(async (req: AuthRequest, res) => {
   const numericRating = Number(rating);
   if (!consultancy || !await Consultancy.exists({ _id: consultancy })) return res.status(404).json({ message: 'Consultancy not found' });
   if (!Number.isInteger(numericRating) || numericRating < 1 || numericRating > 5) return res.status(400).json({ message: 'Choose a rating from 1 to 5.' });
-  if (typeof body !== 'string' || body.trim().length < 15) return res.status(400).json({ message: 'Please write at least 15 characters about your experience.' });
+  if (typeof body !== 'string' || !body.trim()) return res.status(400).json({ message: 'Please write a review about your experience.' });
   if (await Review.exists({ author: req.user!.id, consultancy })) return res.status(409).json({ message: 'You have already reviewed this consultancy.' });
   const review = await Review.create({ consultancy, rating: numericRating, body: body.trim(), author: req.user!.id, status: 'published' });
   await refreshConsultancyRating(consultancy);
