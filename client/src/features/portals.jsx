@@ -354,9 +354,6 @@ export function AdminPortal() {
       (x) => x.verificationStatus !== "verified",
     ),
     openReports = reports.filter((x) => x.status !== "resolved"),
-    reportsToReview = reports.filter(
-      (x) => x.status === "submitted" || x.status === "under_review",
-    ),
     openHelp = helpRequests.filter((x) => x.status !== "resolved");
   return (
     <section className="portal admin-portal">
@@ -397,10 +394,6 @@ export function AdminPortal() {
           <Card>
             <b>{openReports.length}</b>
             <span>Open safety reports</span>
-          </Card>
-          <Card>
-            <b>{reportsToReview.length}</b>
-            <span>Reports to review</span>
           </Card>
           <Card>
             <b>{openHelp.length}</b>
@@ -474,52 +467,6 @@ export function AdminPortal() {
             <div className="empty-state">
               <span>✓</span>
               <p>No student support requests yet.</p>
-            </div>
-          )}
-        </section>
-        <section className="portal-panel" id="reports">
-          <div className="panel-head">
-            <div>
-              <p className="eyebrow">SCAM REPORT APPROVAL</p>
-              <h2>Approve or reject scam reports.</h2>
-            </div>
-            <button className="link" onClick={load}>
-              Refresh reports ↻
-            </button>
-          </div>
-          {reportsToReview.length ? (
-            <div className="review-admin-list">
-              {reportsToReview.map((x) => (
-                <div className="admin-review" key={x._id}>
-                  <div>
-                    <strong>
-                      {x.consultancyName || "Unknown consultancy"} · {x.scamType}
-                    </strong>
-                    <small>Submitted by a student</small>
-                    <p>{x.description}</p>
-                  </div>
-                  <Status>{x.status}</Status>
-                  <div className="queue-actions">
-                    <button
-                      className="link"
-                      onClick={() => status(`/reports/${x._id}/status`, "verified")}
-                    >
-                      Approve
-                    </button>
-                    <button
-                      className="link danger"
-                      onClick={() => status(`/reports/${x._id}/status`, "rejected")}
-                    >
-                      Reject
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="empty-state">
-              <span>✓</span>
-              <p>No scam reports are waiting for review.</p>
             </div>
           )}
         </section>
