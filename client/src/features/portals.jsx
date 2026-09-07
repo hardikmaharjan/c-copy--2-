@@ -13,6 +13,49 @@ const Status = ({ children }) => (
     {children?.replace("_", " ") || "pending"}
   </span>
 );
+
+// Logos are kept small enough to fit safely in the API request. This lets an
+// administrator choose a picture from their computer without needing a
+// separate image-hosting account.
+async function logoFileToDataUrl(file) {
+  if (!file || file.size === 0) return "";
+  if (!file.type.startsWith("image/")) {
+    throw new Error("Please choose an image file for the logo.");
+  }
+  if (file.size > 5 * 1024 * 1024) {
+    throw new Error("Please choose a logo image smaller than 5 MB.");
+  }
+
+  const sourceUrl = URL.createObjectURL(file);
+  try {
+    const image = await new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => resolve(img);
+      img.onerror = () => reject(new Error("That image could not be read."));
+      img.src = sourceUrl;
+    });
+    const largestSide = Math.max(image.naturalWidth, image.naturalHeight);
+    const scale = Math.min(1, 600 / largestSide);
+    const width = Math.max(1, Math.round(image.naturalWidth * scale));
+    const height = Math.max(1, Math.round(image.naturalHeight * scale));
+    const canvas = document.createElement("canvas");
+    canvas.width = width;
+    canvas.height = height;
+    const context = canvas.getContext("2d");
+    if (!context) throw new Error("Your browser could not prepare the logo.");
+    context.fillStyle = "#ffffff";
+    context.fillRect(0, 0, width, height);
+    context.drawImage(image, 0, 0, width, height);
+    const dataUrl = canvas.toDataURL("image/jpeg", 0.75);
+    if (dataUrl.length > 600000) {
+      throw new Error("This logo is still too large. Please use a smaller image.");
+    }
+    return dataUrl;
+  } finally {
+    URL.revokeObjectURL(sourceUrl);
+  }
+}
+
 export function StudentPortal() {
   const { user, setUser } = useAuthStore();
   const [saved, setSaved] = useState([]);
@@ -581,10 +624,11 @@ export function ConsultancyManagement() {
     const f = new FormData(e.currentTarget);
     const visaApprovalRate = f.get("visaApprovalRate");
     try {
+      const uploadedLogo = await logoFileToDataUrl(f.get("logoFile"));
       await http.patch(`/consultancies/${selected._id}`, {
         name: f.get("name"),
         city: f.get("city"),
-        logoUrl: String(f.get("logoUrl") || "").trim(),
+        logoUrl: uploadedLogo || selected.logoUrl || "",
         services: list(f.get("services")),
         destinations: list(f.get("destinations")),
         description: f.get("description"),
@@ -624,10 +668,11 @@ export function ConsultancyManagement() {
     const form = e.currentTarget;
     const f = new FormData(form);
     try {
+      const uploadedLogo = await logoFileToDataUrl(f.get("logoFile"));
       await http.post("/consultancies", {
         name: f.get("name"),
         city: f.get("city"),
-        logoUrl: String(f.get("logoUrl") || "").trim(),
+        logoUrl: uploadedLogo,
         services: list(f.get("services")),
         destinations: list(f.get("destinations")),
         description: f.get("description"),
@@ -728,13 +773,13 @@ export function ConsultancyManagement() {
                 <input name="city" defaultValue={selected.city} required />
               </label>
               <label>
-                Logo image URL
+                Consultancy logo
                 <input
-                  name="logoUrl"
-                  type="url"
-                  defaultValue={selected.logoUrl}
-                  placeholder="https://example.com/logo.png"
+                  name="logoFile"
+                  type="file"
+                  accept="image/png,image/jpeg,image/webp"
                 />
+                <small>Choose a new image from your computer to replace the current logo.</small>
               </label>
               <label>
                 Verification status
@@ -827,7 +872,15 @@ export function ConsultancyManagement() {
           <form className="provider-form" onSubmit={create}>
             <input name="name" placeholder="Consultancy name" required />
             <input name="city" placeholder="City" required />
-            <input name="logoUrl" type="url" placeholder="Logo image URL (https://...)" />
+            <label>
+              Consultancy logo
+              <input
+                name="logoFile"
+                type="file"
+                accept="image/png,image/jpeg,image/webp"
+              />
+              <small>Choose an image from your computer.</small>
+            </label>
             <input
               name="destinations"
               placeholder="Destinations, comma separated"
