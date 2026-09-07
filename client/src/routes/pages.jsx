@@ -747,13 +747,6 @@ export function ConsultancyDetail() {
           </p>
           <div className="consultancy-title-row">
             <h1>{item.name}</h1>
-            {logoSrc && (
-              <img
-                className="consultancy-logo"
-                src={logoSrc}
-                alt={`${item.name} logo`}
-              />
-            )}
           </div>
           <p>
             {item.city}
@@ -767,9 +760,18 @@ export function ConsultancyDetail() {
               : "No approved student reviews yet"}
           </p>
         </div>
-        <Button type="button" onClick={save}>
-          Save expert ♡
-        </Button>
+        <div className="consultancy-actions">
+          {logoSrc && (
+            <img
+              className="consultancy-logo"
+              src={logoSrc}
+              alt={`${item.name} logo`}
+            />
+          )}
+          <Button type="button" onClick={save}>
+            Save expert ♡
+          </Button>
+        </div>
       </section>
       {message && <p className="notice">{message}</p>}
       <section className="consultancy-detail-grid">
