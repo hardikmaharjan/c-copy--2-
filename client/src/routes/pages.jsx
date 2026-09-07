@@ -102,7 +102,7 @@ export function Reviews() { const [params] = useSearchParams(); const [consultan
     return;
 } setLoading(true); http.get('/reviews', { params: { consultancy: selected } }).then(r => setItems(r.data.items)).catch(() => { setItems([]); setMessage('Unable to load reviews.'); }).finally(() => setLoading(false)); }, [selected]); async function submit(e) { e.preventDefault(); try {
     await http.post('/reviews', { ...Object.fromEntries(new FormData(e.currentTarget)), consultancy: selected });
-    setMessage('Review submitted for moderation.');
+    setMessage('Your review is now live.');
     e.currentTarget.reset();
 }
 catch (e) {

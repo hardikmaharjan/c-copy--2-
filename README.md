@@ -39,11 +39,11 @@ For real application data, create it through the API. The admin listing endpoint
 - `client/src/features` contains domain modules: authentication, consultancies, content, reports, reviews, dashboard, and admin.
 - `server/src` contains Express routes, MongoDB models, controllers, and auth middleware.
 
-## Local SMTP OTP
+## Resend OTP email
 
-The API sends OTP emails through a local SMTP server. The default settings use `127.0.0.1:1025`, which works with Mailpit or MailHog without a username or password. Start one of those tools, then open its mailbox UI; Mailpit normally uses `http://localhost:8025`.
+The API sends OTP emails through [Resend](https://resend.com). Create a Resend API key and verify the sending domain, then set `RESEND_API_KEY` and `RESEND_FROM` in `server/.env` locally or in Render's Environment settings for deployment.
 
-The settings live in `server/.env`: `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, and `SMTP_FROM`.
+For Resend testing, `Dream Chaser <onboarding@resend.dev>` can only send to the email address associated with your Resend account. To send to all users, verify your own domain and use an address from it.
 
 ## MongoDB storage
 
@@ -55,8 +55,8 @@ The repository includes `render.yaml` for a Render Blueprint deployment.
 
 1. Push this repository to GitHub, GitLab, or Bitbucket.
 2. In Render, choose **New → Blueprint** and connect the repository.
-3. Render will ask for `MONGODB_URI`, `CLIENT_URL`, and the SMTP settings. Use a MongoDB Atlas connection string for `MONGODB_URI`; set `CLIENT_URL` to the deployed frontend origin without a trailing slash.
+3. Render will ask for `MONGODB_URI`, `CLIENT_URL`, `RESEND_API_KEY`, and `RESEND_FROM`. Use a MongoDB Atlas connection string for `MONGODB_URI`; set `CLIENT_URL` to the deployed frontend origin without a trailing slash.
 4. Deploy the Blueprint. Render generates `JWT_SECRET`, builds the server workspace, and starts `server/dist/index.js`.
 5. Verify `https://YOUR-SERVICE.onrender.com/api/health`, then set the frontend variable `VITE_API_URL=https://YOUR-SERVICE.onrender.com/api` and rebuild the frontend.
 
-Do not add `.env` files, database credentials, SMTP passwords, or JWT secrets to Git.
+Do not add `.env` files, database credentials, Resend keys, or JWT secrets to Git.
