@@ -175,6 +175,10 @@ main {
 .card > a:not(.button) { color: var(--primary); font-size: 12px; font-weight: 800; }
 .card .badge { display: inline-flex; padding: 7px 9px; border-radius: 999px; background: #eeefff; }
 .card .badge.verified-badge { color: #146c43; background: #d9f7e8; }
+.consultancy-card { border-color: rgba(156, 167, 255, .32); background: linear-gradient(135deg, #171c45 0%, #25285f 62%, #4a42bf 100%); box-shadow: 0 18px 42px rgba(28, 31, 87, .2); }
+.consultancy-card h2 { color: #ffffff; }
+.consultancy-card p { color: #d5daec; }
+.consultancy-card > a:not(.button) { color: #9bf6d7; }
 .hero + .grid { margin-top: 18px; }
 .hero + .grid .card { min-height: 188px; background: rgba(255,255,255,.84); transition: transform .2s ease, border-color .2s ease; }
 .hero + .grid .card:hover { transform: translateY(-5px); border-color: #c7c9fc; }

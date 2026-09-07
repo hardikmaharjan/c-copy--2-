@@ -10,7 +10,9 @@ import { Button } from "../components/Button";
 import kangarooEducationFoundationLogo from "../assets/kangaroo-education-foundation.jpeg";
 import { http } from "../services/http";
 import { useAuthStore } from "../store/authStore";
-const Card = ({ children }) => <article className="card">{children}</article>;
+const Card = ({ children, className = "" }) => (
+  <article className={`card ${className}`}>{children}</article>
+);
 const COUNTRIES = [
   {
     name: "Australia",
@@ -670,7 +672,7 @@ export function Consultancies() {
       )}
       <section className="grid">
         {items.map((c) => (
-          <Card key={c._id}>
+          <Card key={c._id} className="consultancy-card">
             <p
               className={`badge ${
                 c.verificationStatus === "verified"
