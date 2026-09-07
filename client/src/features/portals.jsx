@@ -302,15 +302,6 @@ export function AdminPortal() {
         <p>Use an approved Dream Chaser admin account.</p>
       </section>
     );
-  async function status(path, value) {
-    try {
-      await http.patch(path, { status: value });
-      setMessage("Moderation record updated.");
-      await load();
-    } catch (e) {
-      setMessage(e.response?.data?.message || "Unable to update this record.");
-    }
-  }
   async function publish(e) {
     e.preventDefault();
     const form = e.currentTarget;
@@ -354,9 +345,6 @@ export function AdminPortal() {
       (x) => x.verificationStatus !== "verified",
     ),
     openReports = reports.filter((x) => x.status !== "resolved"),
-    reportsToReview = reports.filter(
-      (x) => x.status === "submitted" || x.status === "under_review",
-    ),
     openHelp = helpRequests.filter((x) => x.status !== "resolved");
   return (
     <section className="portal admin-portal">
@@ -477,52 +465,6 @@ export function AdminPortal() {
             </div>
           )}
         </section>
-        <section className="portal-panel" id="reports">
-          <div className="panel-head">
-            <div>
-              <p className="eyebrow">SCAM REPORT APPROVAL</p>
-              <h2>Approve or reject scam reports.</h2>
-            </div>
-            <button className="link" onClick={load}>
-              Refresh reports ↻
-            </button>
-          </div>
-          {reportsToReview.length ? (
-            <div className="review-admin-list">
-              {reportsToReview.map((x) => (
-                <div className="admin-review" key={x._id}>
-                  <div>
-                    <strong>
-                      {x.consultancyName || "Unknown consultancy"} · {x.scamType}
-                    </strong>
-                    <small>Submitted by a student</small>
-                    <p>{x.description}</p>
-                  </div>
-                  <Status>{x.status}</Status>
-                  <div className="queue-actions">
-                    <button
-                      className="link"
-                      onClick={() => status(`/reports/${x._id}/status`, "verified")}
-                    >
-                      Approve
-                    </button>
-                    <button
-                      className="link danger"
-                      onClick={() => status(`/reports/${x._id}/status`, "rejected")}
-                    >
-                      Reject
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="empty-state">
-              <span>✓</span>
-              <p>No scam reports are waiting for review.</p>
-            </div>
-          )}
-        </section>
         <section className="admin-workspace">
           <Card>
             <p className="eyebrow">CONSULTANCY MANAGEMENT</p>
@@ -537,37 +479,8 @@ export function AdminPortal() {
           </Card>
           <Card>
             <p className="eyebrow">SAFETY REPORTS</p>
-            <h2>Open reports</h2>
-            {openReports.length ? (
-              openReports.slice(0, 5).map((x) => (
-                <div className="compact-row" key={x._id}>
-                  <div>
-                    <strong>{x.consultancyName}</strong>
-                    <small>
-                      {x.scamType} · {x.status}
-                    </small>
-                  </div>
-                  <button
-                    className="link"
-                    onClick={() =>
-                      status(`/reports/${x._id}/status`, "under_review")
-                    }
-                  >
-                    Review
-                  </button>
-                  <button
-                    className="link"
-                    onClick={() =>
-                      status(`/reports/${x._id}/status`, "resolved")
-                    }
-                  >
-                    Resolve
-                  </button>
-                </div>
-              ))
-            ) : (
-              <p>There are no open reports.</p>
-            )}
+            <h2>Manage safety reports separately.</h2>
+            <p>{openReports.length} report{openReports.length === 1 ? "" : "s"} currently need attention.</p>
             <Link className="button" to="/admin/reports">
               Open report manager →
             </Link>
