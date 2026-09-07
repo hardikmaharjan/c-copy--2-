@@ -372,7 +372,7 @@ export function AdminPortal() {
         </div>
         <nav>
           <a href="#support">Student support</a>
-          <a href="#reports">Scam reports</a>
+          <Link to="/admin/reports">Manage scam reports</Link>
           <Link to="/admin/consultancies">Manage consultancies</Link>
           <a href="#content">Content studio</a>
         </nav>
