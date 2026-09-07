@@ -81,6 +81,9 @@ export function Home() {
             <span>★ Moderated reviews</span>
             <span>◇ Safety-first reporting</span>
           </div>
+          <p className="no-sponsored-note">
+            There are no sponsored consultancies on our website.
+          </p>
         </div>
         <aside className="hero-panel">
           <p className="eyebrow">YOUR DECISION TOOLKIT</p>
