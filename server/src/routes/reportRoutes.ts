@@ -6,10 +6,13 @@ import { asyncRoute } from '../middleware/asyncRoute.js';
 const router = Router();
 
 router.post('/', requireAuth, asyncRoute(async (req: AuthRequest, res) => {
-  const { consultancy, consultancyName, scamType, description, evidenceUrl } = req.body;
+  const { consultancy, consultancyName, scamType, description, evidenceUrl, evidencePhoto } = req.body;
   if (typeof scamType !== 'string' || typeof description !== 'string' || description.trim().length < 10)
     return res.status(400).json({ message: 'Scam type and a description of at least 10 characters are required' });
-  const evidence = evidenceUrl ? [{ url: String(evidenceUrl) }] : [];
+  if (evidencePhoto && (typeof evidencePhoto !== 'string' || !evidencePhoto.startsWith('data:image/') || evidencePhoto.length > 550000))
+    return res.status(400).json({ message: 'The evidence photo is invalid or too large' });
+  const evidence = evidenceUrl ? [{ url: String(evidenceUrl), label: 'Evidence link' }] : [];
+  if (evidencePhoto) evidence.push({ url: evidencePhoto, label: 'Attached evidence photo' });
   res.status(201).json(await Report.create({ consultancy, consultancyName: String(consultancyName || '').trim(), scamType: scamType.trim(), description: description.trim(), reporter: req.user!.id, evidence }));
 }));
 router.get('/mine', requireAuth, asyncRoute(async (req: AuthRequest, res) => {

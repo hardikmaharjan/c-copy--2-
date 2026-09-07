@@ -999,7 +999,7 @@ export function ScamReportManagement() {
               <article className="support-ticket">
                 <div className="support-ticket-head"><div><span className="support-category">{selected.scamType}</span><h3>Submitted by {selected.reporter?.name || "Student"}</h3><small>{selected.reporter?.email || "No reporter email"} · {new Date(selected.createdAt).toLocaleString()}</small></div><Status>{selected.status}</Status></div>
                 <p className="support-message">{selected.description}</p>
-                <div className="previous-reply"><b>Evidence</b>{selected.evidence?.length ? selected.evidence.map((item, index) => <p key={`${item.url}-${index}`}><a href={item.url} target="_blank" rel="noreferrer">{item.label || `Open evidence ${index + 1}`} ↗</a></p>) : <p>No evidence link was provided.</p>}</div>
+                <div className="previous-reply"><b>Evidence</b>{selected.evidence?.length ? selected.evidence.map((item, index) => <div key={`${item.url}-${index}`} className="report-evidence-item">{String(item.url || "").startsWith("data:image/") ? <img className="report-evidence-photo" src={item.url} alt={`Evidence attachment ${index + 1}`} /> : <p><a href={item.url} target="_blank" rel="noreferrer">{item.label || `Open evidence ${index + 1}`} ↗</a></p>}</div>) : <p>No evidence was provided.</p>}</div>
                 <label>Admin notes<textarea value={adminNotes} onChange={(event) => setAdminNotes(event.target.value)} placeholder="Add notes for the review decision" /></label>
                 <div className="queue-actions">
                   <button className="link" onClick={() => save("under_review")}>Mark under review</button>

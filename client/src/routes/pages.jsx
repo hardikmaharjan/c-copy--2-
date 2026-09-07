@@ -910,16 +910,62 @@ export function StudyInfo() {
     </>
   );
 }
+async function evidencePhotoToDataUrl(file) {
+  if (!file || file.size === 0) return "";
+  if (!file.type.startsWith("image/")) {
+    throw new Error("Please choose an image file for the evidence photo.");
+  }
+  if (file.size > 5 * 1024 * 1024) {
+    throw new Error("Please choose an evidence photo smaller than 5 MB.");
+  }
+  const sourceUrl = URL.createObjectURL(file);
+  try {
+    const image = await new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => resolve(img);
+      img.onerror = () => reject(new Error("That photo could not be read."));
+      img.src = sourceUrl;
+    });
+    const scale = Math.min(
+      1,
+      600 / Math.max(image.naturalWidth, image.naturalHeight),
+    );
+    const width = Math.max(1, Math.round(image.naturalWidth * scale));
+    const height = Math.max(1, Math.round(image.naturalHeight * scale));
+    const canvas = document.createElement("canvas");
+    canvas.width = width;
+    canvas.height = height;
+    const context = canvas.getContext("2d");
+    if (!context) throw new Error("Your browser could not prepare the photo.");
+    context.drawImage(image, 0, 0, width, height);
+    const dataUrl = canvas.toDataURL("image/jpeg", 0.72);
+    if (dataUrl.length > 550000) {
+      throw new Error("This photo is too large. Please choose a smaller image.");
+    }
+    return dataUrl;
+  } finally {
+    URL.revokeObjectURL(sourceUrl);
+  }
+}
+
 export function ReportScam() {
   const [sent, setSent] = useState(false);
   const [message, setMessage] = useState("");
   async function submit(e) {
     e.preventDefault();
+    const form = e.currentTarget;
+    const formData = new FormData(form);
     try {
-      await http.post(
-        "/reports",
-        Object.fromEntries(new FormData(e.currentTarget)),
+      const evidencePhoto = await evidencePhotoToDataUrl(
+        formData.get("evidencePhoto"),
       );
+      await http.post("/reports", {
+        consultancyName: formData.get("consultancyName"),
+        scamType: formData.get("scamType"),
+        description: formData.get("description"),
+        evidenceUrl: formData.get("evidenceUrl"),
+        evidencePhoto,
+      });
       setSent(true);
     } catch (e) {
       setMessage(
@@ -959,6 +1005,15 @@ export function ReportScam() {
           <label>
             Evidence links (optional)
             <input name="evidenceUrl" placeholder="https://..." />
+          </label>
+          <label>
+            Attach an evidence photo (optional)
+            <input
+              name="evidencePhoto"
+              type="file"
+              accept="image/png,image/jpeg,image/webp"
+            />
+            <small>Choose a screenshot or photo from your computer.</small>
           </label>
           <Button>Submit report</Button>
         </form>
