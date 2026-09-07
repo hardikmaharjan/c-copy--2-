@@ -1,113 +1,1090 @@
-import { useEffect, useState } from 'react';
-import { Link, useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom';
-import { Button } from '../components/Button';
-import { http } from '../services/http';
-import { useAuthStore } from '../store/authStore';
+import { useEffect, useState } from "react";
+import {
+  Link,
+  useLocation,
+  useNavigate,
+  useParams,
+  useSearchParams,
+} from "react-router-dom";
+import { Button } from "../components/Button";
+import kangarooEducationFoundationLogo from "../assets/kangaroo-education-foundation.jpeg";
+import { http } from "../services/http";
+import { useAuthStore } from "../store/authStore";
 const Card = ({ children }) => <article className="card">{children}</article>;
 const COUNTRIES = [
-    { name: 'Australia', flag: '🇦🇺', note: 'Career-focused degrees and post-study pathways' },
-    { name: 'Canada', flag: '🇨🇦', note: 'Globally recognised education and diverse campuses' },
-    { name: 'United Kingdom', flag: '🇬🇧', note: 'Focused programmes at historic institutions' },
-    { name: 'Japan', flag: '🇯🇵', note: 'Technology, culture and growing English programmes' },
-    { name: 'Germany', flag: '🇩🇪', note: 'Strong public universities and research options' },
-    { name: 'New Zealand', flag: '🇳🇿', note: 'Supportive study environment and quality education' },
-    { name: 'United States', flag: '🇺🇸', note: 'Flexible programmes across a huge university network' },
-    { name: 'South Korea', flag: '🇰🇷', note: 'Innovation, scholarships and dynamic student life' }
+  {
+    name: "Australia",
+    flag: "🇦🇺",
+    note: "Career-focused degrees and post-study pathways",
+  },
+  {
+    name: "Canada",
+    flag: "🇨🇦",
+    note: "Globally recognised education and diverse campuses",
+  },
+  {
+    name: "United Kingdom",
+    flag: "🇬🇧",
+    note: "Focused programmes at historic institutions",
+  },
+  {
+    name: "Japan",
+    flag: "🇯🇵",
+    note: "Technology, culture and growing English programmes",
+  },
+  {
+    name: "Germany",
+    flag: "🇩🇪",
+    note: "Strong public universities and research options",
+  },
+  {
+    name: "New Zealand",
+    flag: "🇳🇿",
+    note: "Supportive study environment and quality education",
+  },
+  {
+    name: "United States",
+    flag: "🇺🇸",
+    note: "Flexible programmes across a huge university network",
+  },
+  {
+    name: "South Korea",
+    flag: "🇰🇷",
+    note: "Innovation, scholarships and dynamic student life",
+  },
 ];
-export function Home() { return <div className="home-page"><section className="hero"><div className="hero-copy"><p className="eyebrow">YOUR FUTURE, INFORMED</p><h1>Study abroad.<br />Choose with confidence.</h1><p>Compare verified education consultancies, explore destinations, read genuine student feedback, and make your next move with clarity.</p><div className="hero-actions"><Link className="button" to="/countries">Explore by country <span>→</span></Link><Link className="button secondary" to="/consultancies">Browse experts</Link></div><div className="hero-trust"><span>✓ Verified profiles</span><span>★ Moderated reviews</span><span>◇ Safety-first reporting</span></div></div><aside className="hero-panel"><p className="eyebrow">YOUR DECISION TOOLKIT</p><h2>Everything important, before you commit.</h2><div><span>01</span><p><b>Pick a destination</b>Compare the places that match your ambitions.</p></div><div><span>02</span><p><b>Shortlist an expert</b>See verification, services and student outcomes.</p></div><div><span>03</span><p><b>Move safely</b>Save choices, review guidance and report concerns.</p></div></aside></section><section className="trust-strip"><div><b>One clear place</b><span>for research, comparison and safety</span></div><div><b>Verified first</b><span>so trust is visible, not assumed</span></div><div><b>Student centred</b><span>with feedback that is moderated</span></div></section><section className="home-section country-showcase"><div className="section-heading"><div><p className="eyebrow">EXPLORE DESTINATIONS</p><h2>Start with where you want to go.</h2></div><p>Choose a country to discover the verified consultancies that support it best.</p></div><div className="country-card-grid">{COUNTRIES.slice(0, 6).map(country => <Link className="country-card" to={`/countries?country=${encodeURIComponent(country.name)}`} key={country.name}><span>{country.flag}</span><div><h3>{country.name}</h3><p>{country.note}</p></div><b>↗</b></Link>)}</div><Link className="text-cta" to="/countries">See every destination →</Link></section><section className="home-section steps-section"><div className="section-heading"><div><p className="eyebrow">A BETTER WAY TO DECIDE</p><h2>From unsure to ready.</h2></div><p>Keep the process simple without skipping the checks that protect your future.</p></div><div className="experience-grid"><Card><span className="step-icon">01</span><h2>Explore your options</h2><p>Compare destination paths and understand what each country can offer.</p></Card><Card><span className="step-icon">02</span><h2>Check the evidence</h2><p>Review verification, services, contact details and approved student feedback.</p></Card><Card><span className="step-icon">03</span><h2>Build your shortlist</h2><p>Save experts to your dashboard and return when you are ready to decide.</p></Card><Card><span className="step-icon">04</span><h2>Stay protected</h2><p>Raise a concern and follow the status of evidence-backed safety reports.</p></Card></div></section><section className="safety-banner"><div><p className="eyebrow">SAFETY IN YOUR CORNER</p><h2>If something feels wrong, say something.</h2><p>Share a concern securely and help protect the next student making the same decision.</p></div><Link className="button" to="/reports/new">Visit the safety centre →</Link></section></div>; }
-export function Login() { const navigate = useNavigate(); const location = useLocation(); const setUser = useAuthStore(s => s.setUser); const [error, setError] = useState(''); const [busy, setBusy] = useState(false); async function submit(e) { e.preventDefault(); setBusy(true); setError(''); const f = new FormData(e.currentTarget); try {
-    const { data } = await http.post('/auth/login', Object.fromEntries(f));
-    localStorage.setItem('token', data.token);
-    setUser(data.user);
-    const requested = location.state?.from;
-    navigate(requested || (data.user.role === 'admin' ? '/admin' : '/dashboard'), { replace: true });
+export function Home() {
+  return (
+    <div className="home-page">
+      <section className="hero">
+        <div className="hero-copy">
+          <p className="eyebrow">YOUR FUTURE, INFORMED</p>
+          <h1>
+            Study abroad.
+            <br />
+            Choose with confidence.
+          </h1>
+          <p>
+            Compare verified education consultancies, explore destinations, read
+            genuine student feedback, and make your next move with clarity.
+          </p>
+          <div className="hero-actions">
+            <Link className="button" to="/countries">
+              Explore by country <span>→</span>
+            </Link>
+            <Link className="button secondary" to="/consultancies">
+              Browse experts
+            </Link>
+          </div>
+          <div className="hero-trust">
+            <span>✓ Verified profiles</span>
+            <span>★ Moderated reviews</span>
+            <span>◇ Safety-first reporting</span>
+          </div>
+        </div>
+        <aside className="hero-panel">
+          <p className="eyebrow">YOUR DECISION TOOLKIT</p>
+          <h2>Everything important, before you commit.</h2>
+          <div>
+            <span>01</span>
+            <p>
+              <b>Pick a destination</b>Compare the places that match your
+              ambitions.
+            </p>
+          </div>
+          <div>
+            <span>02</span>
+            <p>
+              <b>Shortlist an expert</b>See verification, services and student
+              outcomes.
+            </p>
+          </div>
+          <div>
+            <span>03</span>
+            <p>
+              <b>Move safely</b>Save choices, review guidance and report
+              concerns.
+            </p>
+          </div>
+        </aside>
+      </section>
+      <section className="trust-strip">
+        <div>
+          <b>One clear place</b>
+          <span>for research, comparison and safety</span>
+        </div>
+        <div>
+          <b>Verified first</b>
+          <span>so trust is visible, not assumed</span>
+        </div>
+        <div>
+          <b>Student centred</b>
+          <span>with feedback that is moderated</span>
+        </div>
+      </section>
+      <section className="home-section country-showcase">
+        <div className="section-heading">
+          <div>
+            <p className="eyebrow">EXPLORE DESTINATIONS</p>
+            <h2>Start with where you want to go.</h2>
+          </div>
+          <p>
+            Choose a country to discover the verified consultancies that support
+            it best.
+          </p>
+        </div>
+        <div className="country-card-grid">
+          {COUNTRIES.slice(0, 6).map((country) => (
+            <Link
+              className="country-card"
+              to={`/countries?country=${encodeURIComponent(country.name)}`}
+              key={country.name}
+            >
+              <span>{country.flag}</span>
+              <div>
+                <h3>{country.name}</h3>
+                <p>{country.note}</p>
+              </div>
+              <b>↗</b>
+            </Link>
+          ))}
+        </div>
+        <Link className="text-cta" to="/countries">
+          See every destination →
+        </Link>
+      </section>
+      <section className="home-section steps-section">
+        <div className="section-heading">
+          <div>
+            <p className="eyebrow">A BETTER WAY TO DECIDE</p>
+            <h2>From unsure to ready.</h2>
+          </div>
+          <p>
+            Keep the process simple without skipping the checks that protect
+            your future.
+          </p>
+        </div>
+        <div className="experience-grid">
+          <Card>
+            <span className="step-icon">01</span>
+            <h2>Explore your options</h2>
+            <p>
+              Compare destination paths and understand what each country can
+              offer.
+            </p>
+          </Card>
+          <Card>
+            <span className="step-icon">02</span>
+            <h2>Check the evidence</h2>
+            <p>
+              Review verification, services, contact details and approved
+              student feedback.
+            </p>
+          </Card>
+          <Card>
+            <span className="step-icon">03</span>
+            <h2>Build your shortlist</h2>
+            <p>
+              Save experts to your dashboard and return when you are ready to
+              decide.
+            </p>
+          </Card>
+          <Card>
+            <span className="step-icon">04</span>
+            <h2>Stay protected</h2>
+            <p>
+              Raise a concern and follow the status of evidence-backed safety
+              reports.
+            </p>
+          </Card>
+        </div>
+      </section>
+      <section className="safety-banner">
+        <div>
+          <p className="eyebrow">SAFETY IN YOUR CORNER</p>
+          <h2>If something feels wrong, say something.</h2>
+          <p>
+            Share a concern securely and help protect the next student making
+            the same decision.
+          </p>
+        </div>
+        <Link className="button" to="/reports/new">
+          Visit the safety centre →
+        </Link>
+      </section>
+    </div>
+  );
 }
-catch (e) {
-    setError(e.response?.data?.message || 'Unable to log in');
+export function Login() {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const setUser = useAuthStore((s) => s.setUser);
+  const [error, setError] = useState("");
+  const [busy, setBusy] = useState(false);
+  async function submit(e) {
+    e.preventDefault();
+    setBusy(true);
+    setError("");
+    const f = new FormData(e.currentTarget);
+    try {
+      const { data } = await http.post("/auth/login", Object.fromEntries(f));
+      localStorage.setItem("token", data.token);
+      setUser(data.user);
+      const requested = location.state?.from;
+      navigate(
+        requested || (data.user.role === "admin" ? "/admin" : "/dashboard"),
+        { replace: true },
+      );
+    } catch (e) {
+      setError(e.response?.data?.message || "Unable to log in");
+    } finally {
+      setBusy(false);
+    }
+  }
+  return (
+    <section className="auth">
+      <h1>Welcome back</h1>
+      <form onSubmit={submit}>
+        <label>
+          Email
+          <input name="email" type="email" autoComplete="email" required />
+        </label>
+        <label>
+          Password
+          <input
+            name="password"
+            type="password"
+            autoComplete="current-password"
+            required
+          />
+        </label>
+        {error && (
+          <p className="error" role="alert">
+            {error}
+          </p>
+        )}
+        <Button disabled={busy}>{busy ? "Logging in…" : "Log in"}</Button>
+      </form>
+      <p>
+        New student? <Link to="/register">Create an account</Link>
+      </p>
+    </section>
+  );
 }
-finally {
-    setBusy(false);
-} } return <section className="auth"><h1>Welcome back</h1><form onSubmit={submit}><label>Email<input name="email" type="email" autoComplete="email" required/></label><label>Password<input name="password" type="password" autoComplete="current-password" required/></label>{error && <p className="error" role="alert">{error}</p>}<Button disabled={busy}>{busy ? 'Logging in…' : 'Log in'}</Button></form><p>New student? <Link to="/register">Create an account</Link></p></section>; }
-export function Register() { const navigate = useNavigate(); const setUser = useAuthStore(s => s.setUser); const [message, setMessage] = useState(''); async function submit(e) { e.preventDefault(); const values = Object.fromEntries(new FormData(e.currentTarget)); try {
-    const { data } = await http.post('/auth/register', values);
-    localStorage.setItem('token', data.token);
-    setUser(data.user);
-    navigate(data.user.role === 'admin' ? '/admin' : '/dashboard', { replace: true });
+export function Register() {
+  const navigate = useNavigate();
+  const setUser = useAuthStore((s) => s.setUser);
+  const [message, setMessage] = useState("");
+  async function submit(e) {
+    e.preventDefault();
+    const values = Object.fromEntries(new FormData(e.currentTarget));
+    try {
+      const { data } = await http.post("/auth/register", values);
+      localStorage.setItem("token", data.token);
+      setUser(data.user);
+      navigate(data.user.role === "admin" ? "/admin" : "/dashboard", {
+        replace: true,
+      });
+    } catch (e) {
+      setMessage(e.response?.data?.message || "Unable to register");
+    }
+  }
+  return (
+    <section className="auth">
+      <h1>Create your account</h1>
+      <form onSubmit={submit}>
+        <label>
+          Full name
+          <input name="name" required />
+        </label>
+        <label>
+          Email
+          <input name="email" type="email" required />
+        </label>
+        <label>
+          Password
+          <input name="password" type="password" minLength={8} required />
+        </label>
+        <Button>Create account</Button>
+      </form>
+      {message && <p className="notice">{message}</p>}
+    </section>
+  );
 }
-catch (e) {
-    setMessage(e.response?.data?.message || 'Unable to register');
-} } return <section className="auth"><h1>Create your account</h1><form onSubmit={submit}><label>Full name<input name="name" required/></label><label>Email<input name="email" type="email" required/></label><label>Password<input name="password" type="password" minLength={8} required/></label><Button>Create account</Button></form>{message && <p className="notice">{message}</p>}</section>; }
-export function VerifyOtp() { const navigate = useNavigate(); const [params] = useSearchParams(); const setUser = useAuthStore(s => s.setUser); const [message, setMessage] = useState(''); async function submit(e) { e.preventDefault(); try {
-    const { data } = await http.post('/auth/verify-otp', Object.fromEntries(new FormData(e.currentTarget)));
-    localStorage.setItem('token', data.token);
-    setUser(data.user);
-    navigate('/dashboard');
+export function VerifyOtp() {
+  const navigate = useNavigate();
+  const [params] = useSearchParams();
+  const setUser = useAuthStore((s) => s.setUser);
+  const [message, setMessage] = useState("");
+  async function submit(e) {
+    e.preventDefault();
+    try {
+      const { data } = await http.post(
+        "/auth/verify-otp",
+        Object.fromEntries(new FormData(e.currentTarget)),
+      );
+      localStorage.setItem("token", data.token);
+      setUser(data.user);
+      navigate("/dashboard");
+    } catch (e) {
+      setMessage(e.response?.data?.message || "Unable to verify OTP");
+    }
+  }
+  return (
+    <section className="auth">
+      <h1>Verify your email</h1>
+      <p>Enter the six-digit code from Mailpit.</p>
+      <form onSubmit={submit}>
+        <label>
+          Email
+          <input
+            name="email"
+            type="email"
+            defaultValue={params.get("email") || ""}
+            required
+          />
+        </label>
+        <label>
+          OTP code
+          <input
+            name="otp"
+            inputMode="numeric"
+            pattern="[0-9]{6}"
+            maxLength={6}
+            placeholder="123456"
+            required
+          />
+        </label>
+        <Button>Verify OTP</Button>
+      </form>
+      {message && <p className="error">{message}</p>}
+    </section>
+  );
 }
-catch (e) {
-    setMessage(e.response?.data?.message || 'Unable to verify OTP');
-} } return <section className="auth"><h1>Verify your email</h1><p>Enter the six-digit code from Mailpit.</p><form onSubmit={submit}><label>Email<input name="email" type="email" defaultValue={params.get('email') || ''} required/></label><label>OTP code<input name="otp" inputMode="numeric" pattern="[0-9]{6}" maxLength={6} placeholder="123456" required/></label><Button>Verify OTP</Button></form>{message && <p className="error">{message}</p>}</section>; }
-export function Dashboard() { return <><h1>Student dashboard</h1><section className="grid"><Card><h2>Saved consultancies</h2><p>Your bookmarked providers will appear here.</p></Card><Card><h2>My reports</h2><p>Track your submitted scam reports.</p></Card><Card><h2>Notifications</h2><p>Stay updated when a report is reviewed.</p></Card></section></>; }
+export function Dashboard() {
+  return (
+    <>
+      <h1>Student dashboard</h1>
+      <section className="grid">
+        <Card>
+          <h2>Saved consultancies</h2>
+          <p>Your bookmarked providers will appear here.</p>
+        </Card>
+        <Card>
+          <h2>My reports</h2>
+          <p>Track your submitted scam reports.</p>
+        </Card>
+        <Card>
+          <h2>Notifications</h2>
+          <p>Stay updated when a report is reviewed.</p>
+        </Card>
+      </section>
+    </>
+  );
+}
 export function CountryExplorer() {
-    const [params, setParams] = useSearchParams();
-    const requested = params.get('country');
-    const selected = COUNTRIES.some(country => country.name === requested) ? requested : COUNTRIES[0].name;
-    const current = COUNTRIES.find(country => country.name === selected);
-    const [items, setItems] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState('');
-    const [sort, setSort] = useState('recommended');
-    const [shortlist, setShortlist] = useState([]);
-    useEffect(() => {
-        const controller = new AbortController();
-        setLoading(true);
-        setError('');
-        http.get('/consultancies', { params: { country: selected }, signal: controller.signal })
-            .then(response => setItems(response.data.items))
-            .catch(error => { if (error.code !== 'ERR_CANCELED') setError('Unable to load country recommendations right now.'); })
-            .finally(() => { if (!controller.signal.aborted) setLoading(false); });
-        return () => controller.abort();
-    }, [selected]);
-    const visibleItems = [...items].sort((a, b) => sort === 'rating' ? (b.rating || 0) - (a.rating || 0) : sort === 'name' ? a.name.localeCompare(b.name) : 0);
-    function choose(country) { setParams({ country }); setShortlist([]); }
-    function toggleShortlist(id) { setShortlist(current => current.includes(id) ? current.filter(item => item !== id) : [...current, id]); }
-    return <div className="country-explorer"><section className="country-page-hero"><div><p className="eyebrow">DESTINATION EXPLORER</p><h1>Where do you want to study?</h1><p>Pick a destination and we will surface the highest-rated verified consultancies that support students going there.</p></div><div className="selected-country-visual"><span>{current.flag}</span><small>Currently exploring</small><strong>{current.name}</strong></div></section><section className="country-picker" aria-label="Choose a study country">{COUNTRIES.map(country => <button type="button" className={selected === country.name ? 'active' : ''} onClick={() => choose(country.name)} key={country.name}><span>{country.flag}</span>{country.name}</button>)}</section><section className="country-results"><div className="section-heading"><div><p className="eyebrow">BEST MATCHES FOR {selected.toUpperCase()}</p><h2>Build a shortlist that feels right.</h2></div><p>Explore each card, compare the details that matter, and keep your favourites close.</p></div>{items.length > 0 && <div className="results-toolbar"><p><span>{current.flag}</span><b>{items.length}</b> verified match{items.length === 1 ? '' : 'es'} for {selected}</p><label>Sort results<select value={sort} onChange={event => setSort(event.target.value)}><option value="recommended">Recommended</option><option value="rating">Highest rated</option><option value="name">Name A–Z</option></select></label></div>}{error && <p className="error" role="alert">{error}</p>}{loading ? <div className="results-loading">Finding the best matches…</div> : visibleItems.length ? <><div className="country-results-grid">{visibleItems.map((consultancy, index) => { const picked = shortlist.includes(consultancy._id); return <article className={`country-result-card ${picked ? 'picked' : ''}`} key={consultancy._id}><div className="result-card-top"><p className="badge">✓ Dream Chaser verified</p><span className="result-rank">#{String(index + 1).padStart(2, '0')}</span></div><div className="result-visual"><span className="result-flag">{current.flag}</span><span className="result-plane">↗</span><small>Supports students going to</small><strong>{selected}</strong></div><div className="result-card-body"><p className="result-city">Based in {consultancy.city}</p><h3>{consultancy.name}</h3><div className="result-tags">{(consultancy.services || []).slice(0, 3).map(service => <span key={service}>{service}</span>)}</div><div className="result-metrics"><div><small>Student rating</small><b>{consultancy.reviewCount ? `★ ${consultancy.rating?.toFixed(1)}` : 'New'}</b><span>{consultancy.reviewCount ? `${consultancy.reviewCount} approved reviews` : 'Recently verified'}</span></div><div><small>Reported approval</small><b>{consultancy.visaApprovalRate === undefined ? '—' : `${consultancy.visaApprovalRate}%`}</b><span>{consultancy.visaApprovalRate === undefined ? 'Not reported yet' : 'Consultancy supplied'}</span></div></div></div><div className="result-actions"><button type="button" className={`shortlist-button ${picked ? 'active' : ''}`} aria-pressed={picked} onClick={() => toggleShortlist(consultancy._id)}>{picked ? '♥ Shortlisted' : '♡ Add to shortlist'}</button><Link className="profile-link" to={`/consultancies/${consultancy._id}`}>Explore profile <span>→</span></Link></div></article>; })}</div>{shortlist.length > 0 && <div className="shortlist-bar"><div><span>♥</span><p><b>{shortlist.length} expert{shortlist.length === 1 ? '' : 's'} shortlisted</b><small>Saved for this browsing session</small></p></div><button type="button" onClick={() => setShortlist([])}>Clear shortlist</button></div>}</> : <div className="country-empty"><span>{current.flag}</span><h3>No verified matches yet</h3><p>We are still reviewing consultancies for {selected}. Browse the full directory while we add more.</p><Link className="button" to="/consultancies">Browse all consultancies</Link></div>}</section></div>;
+  const [params, setParams] = useSearchParams();
+  const requested = params.get("country");
+  const selected = COUNTRIES.some((country) => country.name === requested)
+    ? requested
+    : COUNTRIES[0].name;
+  const current = COUNTRIES.find((country) => country.name === selected);
+  const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [sort, setSort] = useState("recommended");
+  const [shortlist, setShortlist] = useState([]);
+  useEffect(() => {
+    const controller = new AbortController();
+    setLoading(true);
+    setError("");
+    http
+      .get("/consultancies", {
+        params: { country: selected },
+        signal: controller.signal,
+      })
+      .then((response) => setItems(response.data.items))
+      .catch((error) => {
+        if (error.code !== "ERR_CANCELED")
+          setError("Unable to load country recommendations right now.");
+      })
+      .finally(() => {
+        if (!controller.signal.aborted) setLoading(false);
+      });
+    return () => controller.abort();
+  }, [selected]);
+  const visibleItems = [...items].sort((a, b) =>
+    sort === "rating"
+      ? (b.rating || 0) - (a.rating || 0)
+      : sort === "name"
+        ? a.name.localeCompare(b.name)
+        : 0,
+  );
+  function choose(country) {
+    setParams({ country });
+    setShortlist([]);
+  }
+  function toggleShortlist(id) {
+    setShortlist((current) =>
+      current.includes(id)
+        ? current.filter((item) => item !== id)
+        : [...current, id],
+    );
+  }
+  return (
+    <div className="country-explorer">
+      <section className="country-page-hero">
+        <div>
+          <p className="eyebrow">DESTINATION EXPLORER</p>
+          <h1>Where do you want to study?</h1>
+          <p>
+            Pick a destination and we will surface the highest-rated verified
+            consultancies that support students going there.
+          </p>
+        </div>
+        <div className="selected-country-visual">
+          <span>{current.flag}</span>
+          <small>Currently exploring</small>
+          <strong>{current.name}</strong>
+        </div>
+      </section>
+      <section className="country-picker" aria-label="Choose a study country">
+        {COUNTRIES.map((country) => (
+          <button
+            type="button"
+            className={selected === country.name ? "active" : ""}
+            onClick={() => choose(country.name)}
+            key={country.name}
+          >
+            <span>{country.flag}</span>
+            {country.name}
+          </button>
+        ))}
+      </section>
+      <section className="country-results">
+        <div className="section-heading">
+          <div>
+            <p className="eyebrow">BEST MATCHES FOR {selected.toUpperCase()}</p>
+            <h2>Build a shortlist that feels right.</h2>
+          </div>
+          <p>
+            Explore each card, compare the details that matter, and keep your
+            favourites close.
+          </p>
+        </div>
+        {items.length > 0 && (
+          <div className="results-toolbar">
+            <p>
+              <span>{current.flag}</span>
+              <b>{items.length}</b> verified match
+              {items.length === 1 ? "" : "es"} for {selected}
+            </p>
+            <label>
+              Sort results
+              <select
+                value={sort}
+                onChange={(event) => setSort(event.target.value)}
+              >
+                <option value="recommended">Recommended</option>
+                <option value="rating">Highest rated</option>
+                <option value="name">Name A–Z</option>
+              </select>
+            </label>
+          </div>
+        )}
+        {error && (
+          <p className="error" role="alert">
+            {error}
+          </p>
+        )}
+        {loading ? (
+          <div className="results-loading">Finding the best matches…</div>
+        ) : visibleItems.length ? (
+          <>
+            <div className="country-results-grid">
+              {visibleItems.map((consultancy, index) => {
+                const picked = shortlist.includes(consultancy._id);
+                return (
+                  <article
+                    className={`country-result-card ${picked ? "picked" : ""}`}
+                    key={consultancy._id}
+                  >
+                    <div className="result-card-top">
+                      <p className="badge">✓ Dream Chaser verified</p>
+                      <span className="result-rank">
+                        #{String(index + 1).padStart(2, "0")}
+                      </span>
+                    </div>
+                    <div className="result-visual">
+                      <span className="result-flag">{current.flag}</span>
+                      <span className="result-plane">↗</span>
+                      <small>Supports students going to</small>
+                      <strong>{selected}</strong>
+                    </div>
+                    <div className="result-card-body">
+                      <p className="result-city">Based in {consultancy.city}</p>
+                      <h3>{consultancy.name}</h3>
+                      <div className="result-tags">
+                        {(consultancy.services || [])
+                          .slice(0, 3)
+                          .map((service) => (
+                            <span key={service}>{service}</span>
+                          ))}
+                      </div>
+                      <div className="result-metrics">
+                        <div>
+                          <small>Student rating</small>
+                          <b>
+                            {consultancy.reviewCount
+                              ? `★ ${consultancy.rating?.toFixed(1)}`
+                              : "New"}
+                          </b>
+                          <span>
+                            {consultancy.reviewCount
+                              ? `${consultancy.reviewCount} approved reviews`
+                              : "Recently verified"}
+                          </span>
+                        </div>
+                        <div>
+                          <small>Reported approval</small>
+                          <b>
+                            {consultancy.visaApprovalRate === undefined
+                              ? "—"
+                              : `${consultancy.visaApprovalRate}%`}
+                          </b>
+                          <span>
+                            {consultancy.visaApprovalRate === undefined
+                              ? "Not reported yet"
+                              : "Consultancy supplied"}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="result-actions">
+                      <button
+                        type="button"
+                        className={`shortlist-button ${picked ? "active" : ""}`}
+                        aria-pressed={picked}
+                        onClick={() => toggleShortlist(consultancy._id)}
+                      >
+                        {picked ? "♥ Shortlisted" : "♡ Add to shortlist"}
+                      </button>
+                      <Link
+                        className="profile-link"
+                        to={`/consultancies/${consultancy._id}`}
+                      >
+                        Explore profile <span>→</span>
+                      </Link>
+                    </div>
+                  </article>
+                );
+              })}
+            </div>
+            {shortlist.length > 0 && (
+              <div className="shortlist-bar">
+                <div>
+                  <span>♥</span>
+                  <p>
+                    <b>
+                      {shortlist.length} expert
+                      {shortlist.length === 1 ? "" : "s"} shortlisted
+                    </b>
+                    <small>Saved for this browsing session</small>
+                  </p>
+                </div>
+                <button type="button" onClick={() => setShortlist([])}>
+                  Clear shortlist
+                </button>
+              </div>
+            )}
+          </>
+        ) : (
+          <div className="country-empty">
+            <span>{current.flag}</span>
+            <h3>No verified matches yet</h3>
+            <p>
+              We are still reviewing consultancies for {selected}. Browse the
+              full directory while we add more.
+            </p>
+            <Link className="button" to="/consultancies">
+              Browse all consultancies
+            </Link>
+          </div>
+        )}
+      </section>
+    </div>
+  );
 }
-export function Consultancies() { const [items, setItems] = useState([]); const [search, setSearch] = useState(''); const [loading, setLoading] = useState(true); const [error, setError] = useState(''); useEffect(() => { const controller = new AbortController(); const timer = window.setTimeout(() => { setLoading(true); setError(''); http.get('/consultancies', { params: { search }, signal: controller.signal }).then(r => setItems(r.data.items)).catch(e => { if (e.code !== 'ERR_CANCELED')
-    setError('Unable to load the consultancy directory.'); }).finally(() => { if (!controller.signal.aborted)
-    setLoading(false); }); }, 250); return () => { window.clearTimeout(timer); controller.abort(); }; }, [search]); return <><section className="page-intro"><p className="eyebrow">THE EXPERT DIRECTORY</p><h1>Find guidance you can believe in.</h1><p>Search verified consultancies, see the destinations they support, and compare feedback before you get in touch.</p></section><input aria-label="Search consultancies" placeholder="Search consultancy or city" value={search} onChange={e => setSearch(e.target.value)}/>{error && <p className="error" role="alert">{error}</p>}<section className="grid">{items.map(c => <Card key={c._id}><p className="badge">{c.verificationStatus === 'verified' ? '✓ Verified' : 'Under review'}</p><h2>{c.name}</h2><p>{c.city} · {(c.services || []).join(', ')}</p><p>{c.reviewCount ? `★ ${c.rating?.toFixed(1)} · ${c.reviewCount} student reviews` : 'No approved reviews yet'}</p><Link to={`/consultancies/${c._id}`}>View profile →</Link></Card>)}{loading && <p>Loading consultancies…</p>}{!loading && !error && !items.length && <p>No consultancies match your search.</p>}</section></>; }
-export function ConsultancyDetail() { const { id } = useParams(); const [item, setItem] = useState(null); const [loading, setLoading] = useState(true); const [error, setError] = useState(''); const [message, setMessage] = useState(''); useEffect(() => { setLoading(true); setError(''); http.get(`/consultancies/${id}`).then(r => setItem(r.data)).catch((e) => setError(e.response?.data?.message || 'Unable to load this consultancy.')).finally(() => setLoading(false)); }, [id]); async function save() { try {
-    await http.post(`/users/me/saved/consultancies/${id}`);
-    setMessage('Consultancy saved to your dashboard.');
+export function Consultancies() {
+  const [items, setItems] = useState([]);
+  const [search, setSearch] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  useEffect(() => {
+    const controller = new AbortController();
+    const timer = window.setTimeout(() => {
+      setLoading(true);
+      setError("");
+      http
+        .get("/consultancies", {
+          params: { search },
+          signal: controller.signal,
+        })
+        .then((r) => setItems(r.data.items))
+        .catch((e) => {
+          if (e.code !== "ERR_CANCELED")
+            setError("Unable to load the consultancy directory.");
+        })
+        .finally(() => {
+          if (!controller.signal.aborted) setLoading(false);
+        });
+    }, 250);
+    return () => {
+      window.clearTimeout(timer);
+      controller.abort();
+    };
+  }, [search]);
+  return (
+    <>
+      <section className="page-intro">
+        <p className="eyebrow">THE EXPERT DIRECTORY</p>
+        <h1>Find guidance you can believe in.</h1>
+        <p>
+          Search verified consultancies, see the destinations they support, and
+          compare feedback before you get in touch.
+        </p>
+      </section>
+      <input
+        aria-label="Search consultancies"
+        placeholder="Search consultancy or city"
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+      />
+      {error && (
+        <p className="error" role="alert">
+          {error}
+        </p>
+      )}
+      <section className="grid">
+        {items.map((c) => (
+          <Card key={c._id}>
+            <p className="badge">
+              {c.verificationStatus === "verified"
+                ? "✓ Verified"
+                : "Under review"}
+            </p>
+            <h2>{c.name}</h2>
+            <p>
+              {c.city} · {(c.services || []).join(", ")}
+            </p>
+            <p>
+              {c.reviewCount
+                ? `★ ${c.rating?.toFixed(1)} · ${c.reviewCount} student reviews`
+                : "No approved reviews yet"}
+            </p>
+            <Link to={`/consultancies/${c._id}`}>View profile →</Link>
+          </Card>
+        ))}
+        {loading && <p>Loading consultancies…</p>}
+        {!loading && !error && !items.length && (
+          <p>No consultancies match your search.</p>
+        )}
+      </section>
+    </>
+  );
 }
-catch (e) {
-    setMessage(e.response?.data?.message || 'Log in to save consultancies.');
-} } if (loading)
-    return <p>Loading consultancy…</p>; if (error || !item)
-    return <section className="page-intro"><h1>Consultancy unavailable</h1><p>{error}</p><Link to="/consultancies">← Back to directory</Link></section>; const verified = item.verificationStatus === 'verified'; return <><Link className="back" to="/consultancies">← Back to directory</Link><section className="consultancy-hero"><div><p className="badge">{verified ? '✓ Dream Chaser verified' : 'Verification in progress'}</p><h1>{item.name}</h1><p>{item.city}{item.destinations?.length ? ` · Supporting ${item.destinations.join(', ')}` : ''}</p><p className="rating-line">{item.reviewCount ? `★ ${item.rating?.toFixed(1)} from ${item.reviewCount} approved student review${item.reviewCount === 1 ? '' : 's'}` : 'No approved student reviews yet'}</p></div><Button type="button" onClick={save}>Save expert ♡</Button></section>{message && <p className="notice">{message}</p>}<section className="consultancy-detail-grid"><Card><p className="eyebrow">ABOUT THIS EXPERT</p><h2>Guidance at every step.</h2><p>{item.description || 'This consultancy has not added an overview yet.'}</p><h3>Services offered</h3><div className="service-tags">{item.services?.length ? item.services.map(service => <span key={service}>{service}</span>) : <span>Details coming soon</span>}</div></Card><Card><p className="eyebrow">CONTACT DETAILS</p><h2>Start a conversation.</h2>{verified ? <div className="contact-list"><p><b>Email</b>{item.contact?.email || 'Not provided'}</p><p><b>Phone</b>{item.contact?.phone || 'Not provided'}</p><p><b>Website</b>{item.contact?.website ? <a href={item.contact.website} target="_blank" rel="noreferrer">Visit website ↗</a> : 'Not provided'}</p></div> : <p>Contact details will appear once the verification review is complete.</p>}</Card><Card><p className="eyebrow">VISA APPROVAL RATE</p><h2>{item.visaApprovalRate === undefined ? 'Not reported' : `${item.visaApprovalRate}%`}</h2><p>This is the consultancy’s reported visa approval rate. Compare it alongside student reviews, costs, and your personal eligibility.</p></Card><Card><p className="eyebrow">STUDENT FEEDBACK</p><h2>Read real experiences.</h2><p>{item.reviewCount ? `This score is based only on approved student reviews.` : 'Be the first student to share an experience after working with this consultancy.'}</p><Link className="button" to={`/reviews?consultancy=${id}`}>Read or write a review →</Link></Card></section></>; }
-export function StudyInfo() { const { type = 'visa' } = useParams(); const title = type[0].toUpperCase() + type.slice(1); const [items, setItems] = useState([]); const [loading, setLoading] = useState(true); const [message, setMessage] = useState(''); useEffect(() => { setLoading(true); setMessage(''); http.get('/content', { params: { type } }).then(r => setItems(r.data.items)).catch(() => setMessage('Unable to load study information.')).finally(() => setLoading(false)); }, [type]); async function save(id) { try {
-    await http.post(`/users/me/saved/content/${id}`);
-    setMessage('Information saved to your dashboard.');
+export function ConsultancyDetail() {
+  const { id } = useParams();
+  const [item, setItem] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [message, setMessage] = useState("");
+  useEffect(() => {
+    setLoading(true);
+    setError("");
+    http
+      .get(`/consultancies/${id}`)
+      .then((r) => setItem(r.data))
+      .catch((e) =>
+        setError(
+          e.response?.data?.message || "Unable to load this consultancy.",
+        ),
+      )
+      .finally(() => setLoading(false));
+  }, [id]);
+  async function save() {
+    try {
+      await http.post(`/users/me/saved/consultancies/${id}`);
+      setMessage("Consultancy saved to your dashboard.");
+    } catch (e) {
+      setMessage(e.response?.data?.message || "Log in to save consultancies.");
+    }
+  }
+  if (loading) return <p>Loading consultancy…</p>;
+  if (error || !item)
+    return (
+      <section className="page-intro">
+        <h1>Consultancy unavailable</h1>
+        <p>{error}</p>
+        <Link to="/consultancies">← Back to directory</Link>
+      </section>
+    );
+  const verified = item.verificationStatus === "verified";
+  return (
+    <>
+      <Link className="back" to="/consultancies">
+        ← Back to directory
+      </Link>
+      <section className="consultancy-hero">
+        <div>
+          <p className="badge">
+            {verified ? "✓ Dream Chaser verified" : "Verification in progress"}
+          </p>
+          <div className="consultancy-title-row">
+            <h1>{item.name}</h1>
+            {item.name.toLowerCase() === "kangaroo education foundation" && (
+              <img
+                className="consultancy-logo"
+                src={kangarooEducationFoundationLogo}
+                alt="Kangaroo Education Foundation logo"
+              />
+            )}
+          </div>
+          <p>
+            {item.city}
+            {item.destinations?.length
+              ? ` · Supporting ${item.destinations.join(", ")}`
+              : ""}
+          </p>
+          <p className="rating-line">
+            {item.reviewCount
+              ? `★ ${item.rating?.toFixed(1)} from ${item.reviewCount} approved student review${item.reviewCount === 1 ? "" : "s"}`
+              : "No approved student reviews yet"}
+          </p>
+        </div>
+        <Button type="button" onClick={save}>
+          Save expert ♡
+        </Button>
+      </section>
+      {message && <p className="notice">{message}</p>}
+      <section className="consultancy-detail-grid">
+        <Card>
+          <p className="eyebrow">ABOUT THIS EXPERT</p>
+          <h2>Guidance at every step.</h2>
+          <p>
+            {item.description ||
+              "This consultancy has not added an overview yet."}
+          </p>
+          <h3>Services offered</h3>
+          <div className="service-tags">
+            {item.services?.length ? (
+              item.services.map((service) => (
+                <span key={service}>{service}</span>
+              ))
+            ) : (
+              <span>Details coming soon</span>
+            )}
+          </div>
+        </Card>
+        <Card>
+          <p className="eyebrow">CONTACT DETAILS</p>
+          <h2>Start a conversation.</h2>
+          {verified ? (
+            <div className="contact-list">
+              <p>
+                <b>Email</b>
+                {item.contact?.email || "Not provided"}
+              </p>
+              <p>
+                <b>Phone</b>
+                {item.contact?.phone || "Not provided"}
+              </p>
+              <p>
+                <b>Website</b>
+                {item.contact?.website ? (
+                  <a
+                    href={item.contact.website}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    Visit website ↗
+                  </a>
+                ) : (
+                  "Not provided"
+                )}
+              </p>
+            </div>
+          ) : (
+            <p>
+              Contact details will appear once the verification review is
+              complete.
+            </p>
+          )}
+        </Card>
+        <Card>
+          <p className="eyebrow">VISA APPROVAL RATE</p>
+          <h2>
+            {item.visaApprovalRate === undefined
+              ? "Not reported"
+              : `${item.visaApprovalRate}%`}
+          </h2>
+          <p>
+            This is the consultancy’s reported visa approval rate. Compare it
+            alongside student reviews, costs, and your personal eligibility.
+          </p>
+        </Card>
+        <Card>
+          <p className="eyebrow">STUDENT FEEDBACK</p>
+          <h2>Read real experiences.</h2>
+          <p>
+            {item.reviewCount
+              ? `This score is based only on approved student reviews.`
+              : "Be the first student to share an experience after working with this consultancy."}
+          </p>
+          <Link className="button" to={`/reviews?consultancy=${id}`}>
+            Read or write a review →
+          </Link>
+        </Card>
+      </section>
+    </>
+  );
 }
-catch (e) {
-    setMessage(e.response?.data?.message || 'Log in to save information.');
-} } return <><h1>{title} information</h1><p>Research requirements, costs, processes and trusted guidance.</p>{message && <p className="notice">{message}</p>}<section className="grid">{items.map(x => <Card key={x._id}><h2>{x.title}</h2><p>{x.summary}</p><Button type="button" onClick={() => save(x._id)}>Save</Button></Card>)}{loading && <p>Loading information…</p>}{!loading && !items.length && <Card><h2>No published information yet</h2><p>An admin can publish {type} guidance from the admin dashboard.</p></Card>}</section></>; }
-export function ReportScam() { const [sent, setSent] = useState(false); const [message, setMessage] = useState(''); async function submit(e) { e.preventDefault(); try {
-    await http.post('/reports', Object.fromEntries(new FormData(e.currentTarget)));
-    setSent(true);
+export function StudyInfo() {
+  const { type = "visa" } = useParams();
+  const title = type[0].toUpperCase() + type.slice(1);
+  const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [message, setMessage] = useState("");
+  useEffect(() => {
+    setLoading(true);
+    setMessage("");
+    http
+      .get("/content", { params: { type } })
+      .then((r) => setItems(r.data.items))
+      .catch(() => setMessage("Unable to load study information."))
+      .finally(() => setLoading(false));
+  }, [type]);
+  async function save(id) {
+    try {
+      await http.post(`/users/me/saved/content/${id}`);
+      setMessage("Information saved to your dashboard.");
+    } catch (e) {
+      setMessage(e.response?.data?.message || "Log in to save information.");
+    }
+  }
+  return (
+    <>
+      <h1>{title} information</h1>
+      <p>Research requirements, costs, processes and trusted guidance.</p>
+      {message && <p className="notice">{message}</p>}
+      <section className="grid">
+        {items.map((x) => (
+          <Card key={x._id}>
+            <h2>{x.title}</h2>
+            <p>{x.summary}</p>
+            <Button type="button" onClick={() => save(x._id)}>
+              Save
+            </Button>
+          </Card>
+        ))}
+        {loading && <p>Loading information…</p>}
+        {!loading && !items.length && (
+          <Card>
+            <h2>No published information yet</h2>
+            <p>
+              An admin can publish {type} guidance from the admin dashboard.
+            </p>
+          </Card>
+        )}
+      </section>
+    </>
+  );
 }
-catch (e) {
-    setMessage(e.response?.data?.message || 'Log in before submitting a report.');
-} } return <section className="auth wide"><h1>Report a consultancy scam</h1><p>Your report follows: Submitted → Under Review → Verified → Resolved.</p>{sent ? <p className="notice">Report submitted. Thank you for helping protect students.</p> : <form onSubmit={submit}><label>Consultancy name<input name="consultancyName" required/></label><label>Scam type<select name="scamType"><option>Fake documents</option><option>Payment fraud</option><option>Misleading information</option><option>Other</option></select></label><label>Describe what happened<textarea name="description" required/></label><label>Evidence links (optional)<input name="evidenceUrl" placeholder="https://..."/></label><Button>Submit report</Button></form>}{message && <p className="error">{message}</p>}</section>; }
-export function Reviews() { const [params] = useSearchParams(); const [consultancies, setConsultancies] = useState([]); const [items, setItems] = useState([]); const [selected, setSelected] = useState(params.get('consultancy') || ''); const [loading, setLoading] = useState(false); const [message, setMessage] = useState(''); useEffect(() => { http.get('/consultancies').then(r => setConsultancies(r.data.items)).catch(() => setMessage('Unable to load consultancies.')); }, []); useEffect(() => { setMessage(''); if (!selected) {
-    setItems([]);
-    return;
-} setLoading(true); http.get('/reviews', { params: { consultancy: selected } }).then(r => setItems(r.data.items)).catch(() => { setItems([]); setMessage('Unable to load reviews.'); }).finally(() => setLoading(false)); }, [selected]); async function submit(e) { e.preventDefault(); const form = e.currentTarget; try {
-    const { data } = await http.post('/reviews', { ...Object.fromEntries(new FormData(form)), consultancy: selected });
-    setItems(current => [{ ...data.review, author: { name: 'You' } }, ...current]);
-    setMessage('Your review is now live.');
-    form.reset();
+export function ReportScam() {
+  const [sent, setSent] = useState(false);
+  const [message, setMessage] = useState("");
+  async function submit(e) {
+    e.preventDefault();
+    try {
+      await http.post(
+        "/reports",
+        Object.fromEntries(new FormData(e.currentTarget)),
+      );
+      setSent(true);
+    } catch (e) {
+      setMessage(
+        e.response?.data?.message || "Log in before submitting a report.",
+      );
+    }
+  }
+  return (
+    <section className="auth wide">
+      <h1>Report a consultancy scam</h1>
+      <p>
+        Your report follows: Submitted → Under Review → Verified → Resolved.
+      </p>
+      {sent ? (
+        <p className="notice">
+          Report submitted. Thank you for helping protect students.
+        </p>
+      ) : (
+        <form onSubmit={submit}>
+          <label>
+            Consultancy name
+            <input name="consultancyName" required />
+          </label>
+          <label>
+            Scam type
+            <select name="scamType">
+              <option>Fake documents</option>
+              <option>Payment fraud</option>
+              <option>Misleading information</option>
+              <option>Other</option>
+            </select>
+          </label>
+          <label>
+            Describe what happened
+            <textarea name="description" required />
+          </label>
+          <label>
+            Evidence links (optional)
+            <input name="evidenceUrl" placeholder="https://..." />
+          </label>
+          <Button>Submit report</Button>
+        </form>
+      )}
+      {message && <p className="error">{message}</p>}
+    </section>
+  );
 }
-catch (e) {
-    setMessage(e.response?.data?.message || 'Log in to submit a review.');
-} } return <><h1>Community reviews</h1><label>Consultancy<select value={selected} onChange={e => setSelected(e.target.value)}><option value="">Choose a consultancy</option>{consultancies.map(x => <option value={x._id} key={x._id}>{x.name}</option>)}</select></label>{message && <p className="notice" role="status">{message}</p>}{selected && <section className="grid"><Card><h2>Share your experience</h2><form onSubmit={submit}><label>Rating<select name="rating"><option value="5">5 - Excellent</option><option value="4">4 - Good</option><option value="3">3 - Average</option><option value="2">2 - Poor</option><option value="1">1 - Very poor</option></select></label><label>Review<textarea name="body" required/></label><Button>Submit review</Button></form></Card><Card><h2>Published reviews</h2>{loading ? <p>Loading reviews…</p> : items.length ? items.map(x => <p key={x._id}>★ {x.rating} · {x.body}<br /><small>by {x.author?.name || 'Student'}</small></p>) : <p>No published reviews yet.</p>}</Card></section>}</>; }
-export function Admin() { return <><h1>Admin dashboard</h1><section className="grid">{['Manage users', 'Verify consultancies', 'Review scam reports', 'Publish visa, country & university information', 'Publish scam alerts', 'Manage reviews'].map(x => <Card key={x}><h2>{x}</h2><Button>Open</Button></Card>)}</section></>; }
+export function Reviews() {
+  const [params] = useSearchParams();
+  const [consultancies, setConsultancies] = useState([]);
+  const [items, setItems] = useState([]);
+  const [selected, setSelected] = useState(params.get("consultancy") || "");
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState("");
+  useEffect(() => {
+    http
+      .get("/consultancies")
+      .then((r) => setConsultancies(r.data.items))
+      .catch(() => setMessage("Unable to load consultancies."));
+  }, []);
+  useEffect(() => {
+    setMessage("");
+    if (!selected) {
+      setItems([]);
+      return;
+    }
+    setLoading(true);
+    http
+      .get("/reviews", { params: { consultancy: selected } })
+      .then((r) => setItems(r.data.items))
+      .catch(() => {
+        setItems([]);
+        setMessage("Unable to load reviews.");
+      })
+      .finally(() => setLoading(false));
+  }, [selected]);
+  async function submit(e) {
+    e.preventDefault();
+    const form = e.currentTarget;
+    try {
+      const { data } = await http.post("/reviews", {
+        ...Object.fromEntries(new FormData(form)),
+        consultancy: selected,
+      });
+      setItems((current) => [
+        { ...data.review, author: { name: "You" } },
+        ...current,
+      ]);
+      setMessage("Your review is now live.");
+      form.reset();
+    } catch (e) {
+      setMessage(e.response?.data?.message || "Log in to submit a review.");
+    }
+  }
+  return (
+    <>
+      <h1>Community reviews</h1>
+      <label>
+        Consultancy
+        <select value={selected} onChange={(e) => setSelected(e.target.value)}>
+          <option value="">Choose a consultancy</option>
+          {consultancies.map((x) => (
+            <option value={x._id} key={x._id}>
+              {x.name}
+            </option>
+          ))}
+        </select>
+      </label>
+      {message && (
+        <p className="notice" role="status">
+          {message}
+        </p>
+      )}
+      {selected && (
+        <section className="grid">
+          <Card>
+            <h2>Share your experience</h2>
+            <form onSubmit={submit}>
+              <label>
+                Rating
+                <select name="rating">
+                  <option value="5">5 - Excellent</option>
+                  <option value="4">4 - Good</option>
+                  <option value="3">3 - Average</option>
+                  <option value="2">2 - Poor</option>
+                  <option value="1">1 - Very poor</option>
+                </select>
+              </label>
+              <label>
+                Review
+                <textarea name="body" required />
+              </label>
+              <Button>Submit review</Button>
+            </form>
+          </Card>
+          <Card>
+            <h2>Published reviews</h2>
+            {loading ? (
+              <p>Loading reviews…</p>
+            ) : items.length ? (
+              items.map((x) => (
+                <p key={x._id}>
+                  ★ {x.rating} · {x.body}
+                  <br />
+                  <small>by {x.author?.name || "Student"}</small>
+                </p>
+              ))
+            ) : (
+              <p>No published reviews yet.</p>
+            )}
+          </Card>
+        </section>
+      )}
+    </>
+  );
+}
+export function Admin() {
+  return (
+    <>
+      <h1>Admin dashboard</h1>
+      <section className="grid">
+        {[
+          "Manage users",
+          "Verify consultancies",
+          "Review scam reports",
+          "Publish visa, country & university information",
+          "Publish scam alerts",
+          "Manage reviews",
+        ].map((x) => (
+          <Card key={x}>
+            <h2>{x}</h2>
+            <Button>Open</Button>
+          </Card>
+        ))}
+      </section>
+    </>
+  );
+}
