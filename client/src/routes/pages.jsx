@@ -28,14 +28,15 @@ catch (e) {
 finally {
     setBusy(false);
 } } return <section className="auth"><h1>Welcome back</h1><form onSubmit={submit}><label>Email<input name="email" type="email" autoComplete="email" required/></label><label>Password<input name="password" type="password" autoComplete="current-password" required/></label>{error && <p className="error" role="alert">{error}</p>}<Button disabled={busy}>{busy ? 'Logging in…' : 'Log in'}</Button></form><p>New student? <Link to="/register">Create an account</Link></p></section>; }
-export function Register() { const navigate = useNavigate(); const [message, setMessage] = useState(''); async function submit(e) { e.preventDefault(); const values = Object.fromEntries(new FormData(e.currentTarget)); try {
+export function Register() { const navigate = useNavigate(); const setUser = useAuthStore(s => s.setUser); const [message, setMessage] = useState(''); async function submit(e) { e.preventDefault(); const values = Object.fromEntries(new FormData(e.currentTarget)); try {
     const { data } = await http.post('/auth/register', values);
-    setMessage(data.message);
-    navigate(`/verify-otp?email=${encodeURIComponent(String(values.email))}`);
+    localStorage.setItem('token', data.token);
+    setUser(data.user);
+    navigate(data.user.role === 'admin' ? '/admin' : '/dashboard', { replace: true });
 }
 catch (e) {
     setMessage(e.response?.data?.message || 'Unable to register');
-} } return <section className="auth"><h1>Create your account</h1><form onSubmit={submit}><label>Full name<input name="name" required/></label><label>Email<input name="email" type="email" required/></label><label>Password<input name="password" type="password" minLength={8} required/></label><Button>Register and receive OTP</Button></form>{message && <p className="notice">{message}</p>}</section>; }
+} } return <section className="auth"><h1>Create your account</h1><form onSubmit={submit}><label>Full name<input name="name" required/></label><label>Email<input name="email" type="email" required/></label><label>Password<input name="password" type="password" minLength={8} required/></label><Button>Create account</Button></form>{message && <p className="notice">{message}</p>}</section>; }
 export function VerifyOtp() { const navigate = useNavigate(); const [params] = useSearchParams(); const setUser = useAuthStore(s => s.setUser); const [message, setMessage] = useState(''); async function submit(e) { e.preventDefault(); try {
     const { data } = await http.post('/auth/verify-otp', Object.fromEntries(new FormData(e.currentTarget)));
     localStorage.setItem('token', data.token);

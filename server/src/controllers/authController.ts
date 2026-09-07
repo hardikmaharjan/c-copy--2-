@@ -34,30 +34,25 @@ export async function register(req: Request, res: Response) {
   if (existingUser?.verifiedAt)
     return res.status(409).json({ message: 'An account with that email already exists' });
 
-  // A previous delivery may have failed or the code may have expired. Let the user
-  // retry registration without creating a duplicate account.
   if (existingUser) {
-    const otp = await createOtp(normalizedEmail);
     existingUser.name = name.trim();
     existingUser.passwordHash = await bcrypt.hash(password, 12);
-    existingUser.otpHash = otp.hash;
-    existingUser.otpExpiresAt = otp.expiresAt;
+    existingUser.verifiedAt = new Date();
+    existingUser.otpHash = undefined;
+    existingUser.otpExpiresAt = undefined;
     await existingUser.save();
-    return res.status(200).json({ message: 'A new OTP has been sent to your email.', user: publicUser(existingUser) });
+    return res.status(200).json({ token: tokenFor(existingUser), user: publicUser(existingUser) });
   }
-
-  const otp = await createOtp(normalizedEmail);
 
   const user = await User.create({
     name,
     email: normalizedEmail,
     passwordHash: await bcrypt.hash(password, 12),
-    otpHash: otp.hash,
-    otpExpiresAt: otp.expiresAt
+    verifiedAt: new Date()
   });
 
   res.status(201).json({
-    message: 'Registration created. Check your email for the OTP.',
+    token: tokenFor(user),
     user: publicUser(user)
   });
 }
@@ -112,12 +107,6 @@ export async function login(req: Request, res: Response) {
   ) {
     return res.status(401).json({
       message: 'Invalid email or password'
-    });
-  }
-
-  if (!user.verifiedAt) {
-    return res.status(403).json({
-      message: 'Verify your email OTP before logging in'
     });
   }
 
