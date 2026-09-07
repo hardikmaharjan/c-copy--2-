@@ -671,7 +671,13 @@ export function Consultancies() {
       <section className="grid">
         {items.map((c) => (
           <Card key={c._id}>
-            <p className="badge">
+            <p
+              className={`badge ${
+                c.verificationStatus === "verified"
+                  ? "verified-badge"
+                  : "pending-badge"
+              }`}
+            >
               {c.verificationStatus === "verified"
                 ? "✓ Verified"
                 : "Under review"}
