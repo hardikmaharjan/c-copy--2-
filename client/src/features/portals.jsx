@@ -584,6 +584,7 @@ export function ConsultancyManagement() {
       await http.patch(`/consultancies/${selected._id}`, {
         name: f.get("name"),
         city: f.get("city"),
+        logoUrl: String(f.get("logoUrl") || "").trim(),
         services: list(f.get("services")),
         destinations: list(f.get("destinations")),
         description: f.get("description"),
@@ -626,6 +627,7 @@ export function ConsultancyManagement() {
       await http.post("/consultancies", {
         name: f.get("name"),
         city: f.get("city"),
+        logoUrl: String(f.get("logoUrl") || "").trim(),
         services: list(f.get("services")),
         destinations: list(f.get("destinations")),
         description: f.get("description"),
@@ -726,6 +728,15 @@ export function ConsultancyManagement() {
                 <input name="city" defaultValue={selected.city} required />
               </label>
               <label>
+                Logo image URL
+                <input
+                  name="logoUrl"
+                  type="url"
+                  defaultValue={selected.logoUrl}
+                  placeholder="https://example.com/logo.png"
+                />
+              </label>
+              <label>
                 Verification status
                 <select
                   name="verificationStatus"
@@ -816,6 +827,7 @@ export function ConsultancyManagement() {
           <form className="provider-form" onSubmit={create}>
             <input name="name" placeholder="Consultancy name" required />
             <input name="city" placeholder="City" required />
+            <input name="logoUrl" type="url" placeholder="Logo image URL (https://...)" />
             <input
               name="destinations"
               placeholder="Destinations, comma separated"

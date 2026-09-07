@@ -730,6 +730,11 @@ export function ConsultancyDetail() {
       </section>
     );
   const verified = item.verificationStatus === "verified";
+  const logoSrc =
+    item.logoUrl ||
+    (item.name.toLowerCase() === "kangaroo education foundation"
+      ? kangarooEducationFoundationLogo
+      : null);
   return (
     <>
       <Link className="back" to="/consultancies">
@@ -742,11 +747,11 @@ export function ConsultancyDetail() {
           </p>
           <div className="consultancy-title-row">
             <h1>{item.name}</h1>
-            {item.name.toLowerCase() === "kangaroo education foundation" && (
+            {logoSrc && (
               <img
                 className="consultancy-logo"
-                src={kangarooEducationFoundationLogo}
-                alt="Kangaroo Education Foundation logo"
+                src={logoSrc}
+                alt={`${item.name} logo`}
               />
             )}
           </div>
