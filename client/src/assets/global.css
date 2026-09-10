@@ -73,6 +73,7 @@ main {
   object-position: center;
   border-radius: 9px;
   background: #ffffff;
+  transform: translateY(-8px);
 }
 
 .site-header nav { display: flex; align-items: center; gap: 6px; color: #505a70; }
