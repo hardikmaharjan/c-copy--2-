@@ -64,13 +64,14 @@ main {
   backdrop-filter: blur(18px);
 }
 
-.brand { display: flex; align-items: center; gap: 10px; font: 800 15px/1 'Manrope'; letter-spacing: -.6px; }
+.brand { display: flex; align-items: center; gap: 9px; font: 800 15px/1 'Manrope'; letter-spacing: -.6px; }
 .brand em { font-style: normal; color: var(--primary); }
 .brand-mark {
-  width: 46px;
-  height: 46px;
+  width: 48px;
+  height: 40px;
   object-fit: contain;
-  border-radius: 11px;
+  object-position: center;
+  border-radius: 9px;
   background: #ffffff;
 }
 
