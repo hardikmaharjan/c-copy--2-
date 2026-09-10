@@ -1,6 +1,6 @@
 import { Link, Outlet, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
-import dcLogo from '../assets/dc-logo.png';
+import dcLogo from '../assets/dc-logo.jpg';
 export function AppLayout() {
     const { user, logout } = useAuthStore();
     const location = useLocation();
