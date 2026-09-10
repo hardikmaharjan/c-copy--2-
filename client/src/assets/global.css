@@ -187,6 +187,27 @@ main {
 
 .page-intro { max-width: 760px; padding: 74px 0 38px; }
 .page-intro h1, main > h1 { margin: 14px 0 18px; font-size: clamp(43px, 6vw, 68px); line-height: 1.04; }
+.community-page { padding-bottom: 45px; }
+.community-intro { padding-bottom: 28px; }
+.community-form, .community-login { display: grid; grid-template-columns: 1.25fr 1fr 1fr; gap: 14px; padding: 28px; border: 1px solid #dfe4ff; border-radius: var(--radius); background: linear-gradient(135deg, #eef0ff, #edfff8); box-shadow: var(--shadow); }
+.community-form > div, .community-form textarea { grid-column: 1 / -1; }
+.community-form h2, .community-login h2 { margin: 8px 0 0; }
+.community-form textarea { min-height: 130px; resize: vertical; }
+.community-form .button { width: max-content; }
+.community-login { display: flex; justify-content: space-between; align-items: center; }
+.community-login p { color: var(--muted); }
+.community-feed { margin-top: 32px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; }
+.community-feed-head { grid-column: 1 / -1; display: flex; align-items: end; justify-content: space-between; }
+.community-feed-head h2 { margin: 8px 0 0; }
+.community-feed-head > span { color: var(--muted); font-size: 13px; font-weight: 700; }
+.community-post, .community-empty { padding: 26px; border: 1px solid #e1e5ef; border-radius: var(--radius); background: #fff; box-shadow: var(--shadow); }
+.community-post-meta { display: flex; align-items: center; justify-content: space-between; gap: 14px; }
+.community-post-meta span { padding: 6px 9px; border-radius: 999px; color: #176d4a; background: #def8ea; font-size: 10px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+.community-post-meta small, .community-provider { color: var(--muted); }
+.community-post h2 { margin: 16px 0 6px; }
+.community-post > p:not(.community-provider) { white-space: pre-wrap; color: #435069; line-height: 1.7; }
+.community-post > b { color: var(--primary); font-size: 12px; }
+.community-empty { grid-column: 1 / -1; }
 .page-intro p:not(.eyebrow), main > p { max-width: 620px; color: var(--muted); line-height: 1.7; }
 .page-intro + input { max-width: 580px; min-height: 52px; padding-left: 18px; border-radius: 14px; background: white; box-shadow: 0 10px 25px rgba(32,44,76,.06); }
 .back { display: inline-block; margin: 22px 0 16px; color: var(--muted); font-size: 13px; font-weight: 700; }

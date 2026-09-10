@@ -868,54 +868,100 @@ export function ConsultancyDetail() {
   );
 }
 export function StudyInfo() {
-  const { type = "visa" } = useParams();
-  const title = type[0].toUpperCase() + type.slice(1);
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState("");
+  const { user } = useAuthStore();
   useEffect(() => {
     setLoading(true);
     setMessage("");
     http
-      .get("/content", { params: { type } })
+      .get("/community")
       .then((r) => setItems(r.data.items))
-      .catch(() => setMessage("Unable to load study information."))
+      .catch(() => setMessage("Unable to load community stories."))
       .finally(() => setLoading(false));
-  }, [type]);
-  async function save(id) {
+  }, []);
+  async function publish(event) {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const data = new FormData(form);
     try {
-      await http.post(`/users/me/saved/content/${id}`);
-      setMessage("Information saved to your dashboard.");
+      const response = await http.post("/community", {
+        title: data.get("title"),
+        consultancyName: data.get("consultancyName"),
+        stage: data.get("stage"),
+        body: data.get("body"),
+      });
+      setItems((current) => [response.data, ...current]);
+      form.reset();
+      setMessage("Your story has been shared with the community.");
     } catch (e) {
-      setMessage(e.response?.data?.message || "Log in to save information.");
+      setMessage(e.response?.data?.message || "Log in to share your story.");
     }
   }
   return (
-    <>
-      <h1>{title} information</h1>
-      <p>Research requirements, costs, processes and trusted guidance.</p>
+    <section className="community-page">
+      <section className="page-intro community-intro">
+        <p className="eyebrow">STUDENT COMMUNITY</p>
+        <h1>Stories from the study-abroad journey.</h1>
+        <p>
+          Share your experience with a consultancy, application progress, visa
+          journey, and useful lessons for the next student.
+        </p>
+      </section>
       {message && <p className="notice">{message}</p>}
-      <section className="grid">
+      {user ? (
+        <form className="community-form" onSubmit={publish}>
+          <div>
+            <p className="eyebrow">SHARE YOUR UPDATE</p>
+            <h2>Help another student move forward.</h2>
+          </div>
+          <input name="title" placeholder="Give your post a title" required />
+          <input name="consultancyName" placeholder="Consultancy name (optional)" />
+          <select name="stage" defaultValue="Other">
+            <option>Researching</option>
+            <option>Applying</option>
+            <option>Visa process</option>
+            <option>Accepted</option>
+            <option>Studying abroad</option>
+            <option>Other</option>
+          </select>
+          <textarea name="body" placeholder="What happened? What did you learn? What progress have you made?" required />
+          <Button>Share my story →</Button>
+        </form>
+      ) : (
+        <section className="community-login">
+          <div>
+            <p className="eyebrow">YOUR VOICE MATTERS</p>
+            <h2>Want to share your journey?</h2>
+            <p>Log in to write a post about your experience and progress.</p>
+          </div>
+          <Link className="button" to="/login">Log in to post →</Link>
+        </section>
+      )}
+      <section className="community-feed">
+        <div className="community-feed-head">
+          <div><p className="eyebrow">COMMUNITY FEED</p><h2>Latest student stories</h2></div>
+          <span>{items.length} post{items.length === 1 ? "" : "s"}</span>
+        </div>
         {items.map((x) => (
-          <Card key={x._id}>
+          <article className="community-post" key={x._id}>
+            <div className="community-post-meta">
+              <span>{x.stage}</span>
+              <small>{new Date(x.createdAt).toLocaleDateString()}</small>
+            </div>
             <h2>{x.title}</h2>
-            <p>{x.summary}</p>
-            <Button type="button" onClick={() => save(x._id)}>
-              Save
-            </Button>
-          </Card>
+            {x.consultancyName && <p className="community-provider">With {x.consultancyName}</p>}
+            <p>{x.body}</p>
+            <b>Shared by {x.author?.name || "A student"}</b>
+          </article>
         ))}
         {loading && <p>Loading information…</p>}
         {!loading && !items.length && (
-          <Card>
-            <h2>No published information yet</h2>
-            <p>
-              An admin can publish {type} guidance from the admin dashboard.
-            </p>
-          </Card>
+          <div className="community-empty"><h2>No stories yet.</h2><p>Be the first student to share an experience.</p></div>
         )}
       </section>
-    </>
+    </section>
   );
 }
 async function evidencePhotoToDataUrl(file) {
