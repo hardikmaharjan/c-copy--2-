@@ -67,15 +67,11 @@ main {
 .brand { display: flex; align-items: center; gap: 10px; font: 800 15px/1 'Manrope'; letter-spacing: -.6px; }
 .brand em { font-style: normal; color: var(--primary); }
 .brand-mark {
-  width: 34px;
-  height: 34px;
+  width: 46px;
+  height: 46px;
+  object-fit: contain;
   border-radius: 11px;
-  display: inline-grid;
-  place-items: center;
-  background: linear-gradient(135deg, var(--primary), #8b72ff);
-  color: white;
-  font-size: 20px;
-  box-shadow: 0 8px 18px rgba(91, 92, 240, .27);
+  background: #ffffff;
 }
 
 .site-header nav { display: flex; align-items: center; gap: 6px; color: #505a70; }
